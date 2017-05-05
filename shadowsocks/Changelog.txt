@@ -1,5 +1,39 @@
 Koolshare Asuswrt-Merlin shadowsocks Changelog
 ===========================================
+3.3.9
+   - update	update shadowsocks-libev to 3.0.6, now ss binary was compiled by new toolchian (https://github.com/koolshare/arm-fw867-linux-uclibcgnueabi) with gcc version 5.3.0.
+
+3.3.8
+   - add	添加回国模式:回国模式下建议使用dnscrypt-proxy和ChinaDNS(国外自定义例如8.8.8.8直连)两种方案。
+   - fix	修复某些情况下ss-tunnel的启动问题
+   - fix	修复socks5关闭后进程仍然存在的问题
+
+
+3.3.7
+   - fix	fix ssr-tunnel show working but have no pid
+   - fix	fix some element in web
+   - remove	remove useless binary in bin folder
+   - update	decrease the interval of get log, now the log should be more smooth.
+   - add	add link of one key install ss/ssr server script by clang.
+
+3.3.6
+   - fix	web：fix edit botton missing when edit ss node.
+
+3.3.5
+   - fix	脚本：修复一个小问题
+
+3.3.4
+   - update	程序：更新shadowsocks-libev 3.0.5；
+   - update	程序：更新simple-obfs 0.0.3；
+   - update	程序：更新kcptun 为20170322；
+   - add	web：添加shadowsocks-libev混淆支持(需要服务器端支持)
+   - add	web：节点名前添加帐号类型标志
+   - add	web：添加详细状态显示，目前显示的内容：1，版本信息；2,程序运行状态；3，iptables状态
+   		如果显示异常，请强制刷新一次（ctrl + f5）
+   - fix	脚本：修复pdnsd上游dns为dns2socks时，ss-local未开启的bug
+   - update	脚本：现在大陆白名单和游戏模式下，gfwlist只有在访问控制中存在gfwlist模式的主机时才会加载
+   - update	规则：同步最新gfwlist，chnroute和cdn名单。
+   
 3.3.3
    - remove	移除koolshare logo和支持信息；
    - add	添加电报群交流链接；

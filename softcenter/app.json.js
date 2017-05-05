@@ -101,14 +101,14 @@
             "version": "0.2"
         }, 
         {
-            "build_date": "2017-02-17_00:15:45", 
+            "build_date": "2017-05-03_16:57:23", 
             "description": "科学上网", 
             "home_url": "Main_Ss_Content.asp", 
-            "md5": "42edc029ec547e68bfc0d847f75bbb1d", 
+            "md5": "ba426d7314e4279056115cd80e680a06", 
             "name": "shadowsocks", 
             "tar_url": "shadowsocks/shadowsocks.tar.gz", 
             "title": "shadowsocks", 
-            "version": "3.3.3"
+            "version": "3.3.9"
         }, 
         {
             "build_date": "2016-05-07_01:41:30", 
@@ -122,7 +122,7 @@
         }
     ], 
     "home_url": "https://raw.githubusercontent.com/koolshare/koolshare.github.io/master", 
-    "md5": "dc3e6e9cefa2defbb845b2e4cbf43337", 
+    "md5": "5a28e640f96d22d4d4dd6b35cc0ad4c9", 
     "tar_url": "softcenter/softcenter.tar.gz", 
-    "version": "1.2.9"
+    "version": "1.3.1"
 }
