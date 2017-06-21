@@ -64,15 +64,15 @@ echo_version(){
 	echo ① 程序版本（插件版本：3.3.4）：
 	echo -----------------------------------------------------------
 	echo "程序			版本		备注"
-	echo "ss-reidr		3.0.5		2017年3月28日"
-	echo "ss-tunnel		3.0.5 		2017年3月28日"
-	echo "ss-local		3.0.5		2017年3月28日"
+	echo "ss-redir		3.0.6		2017年4月26日"
+	echo "ss-tunnel		3.0.6 		2017年4月26日"
+	echo "ss-local		3.0.6		2017年4月26日"
 	echo "obfs-local		0.0.3		2017年3月28日"
-	echo "ssr-reidr		2.5.6 		with mbed TLS 2.4.0"
+	echo "ssr-redir		2.5.6 		with mbed TLS 2.4.0"
 	echo "ssr-tunnel		2.5.6 		with mbed TLS 2.4.0"
 	echo "ssr-local		2.5.6 		with mbed TLS 2.4.0"
-	echo "client_linux_arm5	20170322	kcptun"
-	echo "haproxy			1.7.1	"
+	echo "client_linux_arm5	20170525	kcptun"
+	echo "haproxy			1.7.5	"
 	echo "dns2socks		V2.0 	"
 	echo "dnscrypt-proxy		1.7.0 	"
 	echo "ChinaDNS		1.3.2 	"
@@ -130,7 +130,7 @@ check_status(){
 		[ -n "$KCPTUN" ] && echo "kcptun		工作中	pid：$KCPTUN" || echo "kcptun		未运行"
 	fi
 	if [ "$ss_basic_server" == "127.0.0.1" ];then
-	 	 -n "$HAPROXY" ] && echo "haproxy		工作中	pid：$HAPROXY" || echo "haproxy		未运行"
+	 	[ -n "$HAPROXY" ] && echo "haproxy		工作中	pid：$HAPROXY" || echo "haproxy		未运行"
 	fi
 	if [ "$ss_dns_foreign" == "1" ];then
 		if [ "$ss_basic_use_rss" == "1" ];then
@@ -247,32 +247,32 @@ check_status(){
 	echo ----------------------------------------------------- nat表 SHADOWSOCKS 链 --------------------------------------------------------
 	iptables -nvL SHADOWSOCKS -t nat
 	echo
-	echo ----------------------------------------------------- nat表 SHADOWSOCKS_GFW 链 ----------------------------------------------------
-	iptables -nvL SHADOWSOCKS_GFW -t nat
-	echo
-	echo ----------------------------------------------------- nat表 SHADOWSOCKS_CHN 链 -----------------------------------------------------
-	iptables -nvL SHADOWSOCKS_CHN -t nat
-	echo
-	echo ----------------------------------------------------- nat表 SHADOWSOCKS_GAM 链 -----------------------------------------------------
-	iptables -nvL SHADOWSOCKS_GAM -t nat
-	echo
-	echo ----------------------------------------------------- nat表 SHADOWSOCKS_GLO 链 -----------------------------------------------------
-	iptables -nvL SHADOWSOCKS_GLO -t nat
-	echo
-	echo ----------------------------------------------------- nat表 SHADOWSOCKS_HOM 链 -----------------------------------------------------
-	iptables -nvL SHADOWSOCKS_HOM -t nat
-	echo -----------------------------------------------------------------------------------------------------------------------------------
-	echo
+	[ "$ss_basic_mode" != "4" ] && echo ----------------------------------------------------- nat表 SHADOWSOCKS_GFW 链 ----------------------------------------------------
+	[ "$ss_basic_mode" != "4" ] && iptables -nvL SHADOWSOCKS_GFW -t nat
+	[ "$ss_basic_mode" != "4" ] && echo
+	[ "$ss_basic_mode" != "4" ] && echo ----------------------------------------------------- nat表 SHADOWSOCKS_CHN 链 -----------------------------------------------------
+	[ "$ss_basic_mode" != "4" ] && iptables -nvL SHADOWSOCKS_CHN -t nat
+	[ "$ss_basic_mode" != "4" ] && echo
+	[ "$ss_basic_mode" != "4" ] && echo ----------------------------------------------------- nat表 SHADOWSOCKS_GAM 链 -----------------------------------------------------
+	[ "$ss_basic_mode" != "4" ] && iptables -nvL SHADOWSOCKS_GAM -t nat
+	[ "$ss_basic_mode" != "4" ] && echo
+	[ "$ss_basic_mode" != "4" ] && echo ----------------------------------------------------- nat表 SHADOWSOCKS_GLO 链 -----------------------------------------------------
+	[ "$ss_basic_mode" != "4" ] && iptables -nvL SHADOWSOCKS_GLO -t nat
+	[ "$ss_basic_mode" != "4" ] && echo
+	[ "$ss_basic_mode" != "4" ] && echo ----------------------------------------------------- nat表 SHADOWSOCKS_HOM 链 -----------------------------------------------------
+	[ "$ss_basic_mode" != "4" ] && iptables -nvL SHADOWSOCKS_HOM -t nat
+	[ "$ss_basic_mode" != "4" ] && echo -----------------------------------------------------------------------------------------------------------------------------------
+	[ "$ss_basic_mode" != "4" ] && echo
 	[ -n "$game_on" ] || [ "$ss_basic_mode" == "3" ] || [ "$ss_basic_mode" == "4" ] && echo ------------------------------------------------------ mangle表 PREROUTING 链 -------------------------------------------------------
 	[ -n "$game_on" ] || [ "$ss_basic_mode" == "3" ] || [ "$ss_basic_mode" == "4" ] && iptables -nvL PREROUTING -t mangle
 	[ -n "$game_on" ] || [ "$ss_basic_mode" == "3" ] || [ "$ss_basic_mode" == "4" ] && echo
 	[ -n "$game_on" ] || [ "$ss_basic_mode" == "3" ] || [ "$ss_basic_mode" == "4" ] && echo ------------------------------------------------------ mangle表 SHADOWSOCKS 链 -------------------------------------------------------
 	[ -n "$game_on" ] || [ "$ss_basic_mode" == "3" ] || [ "$ss_basic_mode" == "4" ] && iptables -nvL SHADOWSOCKS -t mangle
 	[ -n "$game_on" ] || [ "$ss_basic_mode" == "3" ] || [ "$ss_basic_mode" == "4" ] && echo
-	[ -n "$game_on" ] || [ "$ss_basic_mode" == "3" ] || [ "$ss_basic_mode" == "4" ] && echo ------------------------------------------------------ mangle表 SHADOWSOCKS_GAM 链 -------------------------------------------------------
-	[ -n "$game_on" ] || [ "$ss_basic_mode" == "3" ] || [ "$ss_basic_mode" == "4" ] && iptables -nvL SHADOWSOCKS_GAM -t mangle
-	[ -n "$game_on" ] || [ "$ss_basic_mode" == "3" ] || [ "$ss_basic_mode" == "4" ] && echo -----------------------------------------------------------------------------------------------------------------------------------
-	[ -n "$game_on" ] || [ "$ss_basic_mode" == "3" ] || [ "$ss_basic_mode" == "4" ] && echo
+	[ -n "$game_on" ] || [ "$ss_basic_mode" == "3" ] && echo ------------------------------------------------------ mangle表 SHADOWSOCKS_GAM 链 -------------------------------------------------------
+	[ -n "$game_on" ] || [ "$ss_basic_mode" == "3" ] && iptables -nvL SHADOWSOCKS_GAM -t mangle
+	echo -----------------------------------------------------------------------------------------------------------------------------------
+	echo
 }
 
 if [ "$ss_basic_enable" == "1" ];then

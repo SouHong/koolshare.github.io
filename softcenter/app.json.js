@@ -21,16 +21,6 @@
             "version": "1.6"
         }, 
         {
-            "build_date": "2016-04-27_23:31:52", 
-            "description": "让测速更简单", 
-            "home_url": "Module_speedtest.asp", 
-            "md5": "5a072a57af3b9bb1343a241a44278dd2", 
-            "name": "speedtest", 
-            "tar_url": "speedtest/speedtest.tar.gz", 
-            "title": "网络测速", 
-            "version": "0.2.2"
-        }, 
-        {
             "build_date": "2016-11-25_21:41:36", 
             "description": "SVPN让游戏更畅快", 
             "home_url": "Module_shadowvpn.asp", 
@@ -59,6 +49,16 @@
             "tar_url": "shellinabox/shellinabox.tar.gz", 
             "title": "shellinabox", 
             "version": "1.4"
+        }, 
+        {
+            "description": "穿透 DDNS, 服务器转发方式", 
+            "home_url": "Module_tunnel.asp", 
+            "md5": "c9f45ccde00d04943ddcf4f8ddecbada", 
+            "module": "tunnel", 
+            "name": "tunnel", 
+            "tar_url": "tunnel/tunnel.tar.gz", 
+            "title": "穿透DDNS", 
+            "version": "0.8"
         }, 
         {
             "build_date": "2016-10-09_14:54:55", 
@@ -101,14 +101,14 @@
             "version": "0.2"
         }, 
         {
-            "build_date": "2017-05-03_16:57:23", 
+            "build_date": "2017-06-12_19:16:53", 
             "description": "科学上网", 
             "home_url": "Main_Ss_Content.asp", 
-            "md5": "ba426d7314e4279056115cd80e680a06", 
+            "md5": "3ac3526dfe19a9c2b08fa1d2f393c273", 
             "name": "shadowsocks", 
             "tar_url": "shadowsocks/shadowsocks.tar.gz", 
             "title": "shadowsocks", 
-            "version": "3.3.9"
+            "version": "3.5.5"
         }, 
         {
             "build_date": "2016-05-07_01:41:30", 
@@ -122,7 +122,7 @@
         }
     ], 
     "home_url": "https://raw.githubusercontent.com/koolshare/koolshare.github.io/master", 
-    "md5": "5a28e640f96d22d4d4dd6b35cc0ad4c9", 
+    "md5": "04b7ccbe4db7b9abb000bb0478b1a4db", 
     "tar_url": "softcenter/softcenter.tar.gz", 
-    "version": "1.3.1"
+    "version": "1.3.2"
 }

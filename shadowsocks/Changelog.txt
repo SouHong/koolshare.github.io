@@ -1,5 +1,84 @@
 Koolshare Asuswrt-Merlin shadowsocks Changelog
 ===========================================
+3.5.5
+   - fix	修复SHADOWSOCKS_GAM链有时候不创建的问题。
+
+3.5.4
+   - fix	游戏模式V2回滚为和ss插件3.1.5版本一样的体验（iptables，后台脚本，访问控制等），现在游戏模式V2的流量在iptables中会少转发一次；
+   - fix	修复游戏模式V2局域网控制黑白名单为空时所有客户端都不走koolgame的bug；
+   - update 	同步最新gfwlist.conf chnroute.txt cdn.txt。
+
+3.5.3
+   - fix	fix layout of load Main_Ss_LoadBlance.asp and Main_SsLocal_Content.asp
+
+3.5.2
+   - fix	修复SS访问控制，默认模式有几率变为空值，导致显示双working但是不能翻墙的问题。
+   - fix 	修复可能的浏览器兼容问题，导致不显示节点列表的问题。
+
+3.5.1
+   - fix	修复在X7.5固件下自定义dnsmasq,IP/CIDR白名单,域名白名单,IP/CIDR黑名单,域名黑名单内容在IE浏览器下显示乱码的问题;
+   		该问题是由X7.5固件浏览器兼容性的更改造成的，导致用IE浏览器提交后，ss不正常工作。
+
+3.5.0
+   - update	update ss-rlibev to latest: fix UDP host & portl;
+   - update	update haproxy to 1.7.5.
+
+3.4.9
+   - fix	修复在DNS解析在国内优先下，自定义国内DNS不起作用的bug;
+   - fix	修复使用负载均衡时，详细状态检测出错的bug；修复详细状态内一些拼写错误；
+   - update	同步ssr-libev最新代码，commit:0f529efa4cc37713822a32b0a662a4735dd8962a.
+
+3.4.8
+   - update	ssr-libev刚修复了一个auth_chain_a协议下UDP相关的BUG，因此merlin ss插件同步更新；
+   - update	更新ss-libev到最新代码，同时更换为全静态编译；
+   - update	更新kcptun到20170525最新版本。
+
+3.4.7
+   - fix	恢复shadowsocksR的ss-tunnel DNS解析功能.
+   		3.4.6更新日志大雾：ssr-tunnel并不是没有做好，而是和ssr-local合并了，此次更新已经恢复。
+
+3.4.6
+   - update	更新shadowsocksR-libev最新版，支持none加密和auth_chain_a协议;
+   		注意：因为该版本ssr-tunnel官方并没有做好，所以选择none加密或者auth_chain_a协议时不能使用ss-tunnel作为DNS解析！
+
+3.4.5
+   - fix	去掉auth_chain_a选项，之前因为测试时加上了，推送时忘了去掉，实际上现在并不支持该协议。
+	
+3.4.4
+   - fix	修复https://github.com/koolshare/koolshare.github.io/issues/333
+		修复在低分辨率屏幕上，添加SS节点被浏览器边缘挡住;
+		修复添加SSR节点时，切换模式后参数展示错误;
+		
+3.4.3
+   - fix	修复在X7.5固件下，ss界面整体偏移的问题；
+   - fix	修复SS节点在不同浏览器(firefox, chrome56, chrome58)下或者不同固件版本下(X7.4, X7.5)错位的问题；
+   - update	优化SS节点界面布局，现在页面上可以显示更多节点（14个）；
+   - fix	修复在X7.5固件下下拉选择客户端报错的问题。
+   - fix	修复附加功能点击提交无法应用的问题（比如侧边栏开关）；
+
+3.4.2
+   - fix	修复ss主界面在380.66_X7.5固件中的错位问题。
+
+3.4.1
+   - fix	修复SSR json格式检测不准确问题；
+   - update	nslookup方式解析错误后会用resolveip尝试一次
+   		（ps：前几日腾讯DNS：119.29.29.29出现问题导致很多朋友出现问题，119.29.29.29现已恢复）；
+   - update	当输入服务器，端口，密码时，如果开头或者结束有空格，会自动清除之；
+   - update	去除快速应用DNS，快速应用黑白名单，快速应用附加设置；
+ 		因为重启部分服务或者进程有时候会出现问题，现在改为重启全部服务；
+ 		在这些设置提交时都会重启整个SS服务器，以保证SS相关的所有进程和配置工作正常。
+   - update	更新kcptun客户端到20170329版本；
+   - update	同步最新ss规则。
+
+3.4.0
+   - add	ss配置恢复支持SSR json格式节点；
+   - update	ss配置导出/恢复功能移动到附加功能；
+   - update	现在导入json格式节点默认为大陆白名单模式；
+   - fix	修复用json导入节点配置时导致已有的节点密码变成乱码的bug；
+   - 说明	ss配置恢复不仅可以恢复本插件保存的ss数据:ss_conf_backup.txt，如果已经有配置，导入此配置将覆盖已有配置
+   		还能导入ss/ssr服务商，PC端ss/ssr等提供的json格式的节点数据，如果已经有配置，导入此配置将新增json内的节点，而不会覆盖
+   		建议大家在用json导入节点后，用插件的【导出配置】功能备份一次插件数据。
+
 3.3.9
    - update	update shadowsocks-libev to 3.0.6, now ss binary was compiled by new toolchian (https://github.com/koolshare/arm-fw867-linux-uclibcgnueabi) with gcc version 5.3.0.
 

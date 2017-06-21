@@ -49,6 +49,57 @@ function init() {
 	document.form.ss_basic_action.value = 1;
 }
 
+function browser_compatibility1(){
+	//fw versiom
+	var _fw="<% nvram_get("extendno"); %>";
+	fw_version=parseFloat(_fw.split("X")[1]);
+	// chrome
+	var isChrome = navigator.userAgent.search("Chrome") > -1;
+	if(isChrome){
+		var major = navigator.userAgent.match("Chrome\/([0-9]*)\.");    //check for major version
+		var isChrome56 = (parseInt(major[1], 10) >= 56);
+	} else {
+		var isChrome56 = false;
+	}
+	if((isChrome56) && document.getElementById("FormTitle") && fw_version < 7.5){
+		document.getElementById("FormTitle").className = "FormTitle_chrome56";
+		//console.log("fw_version", fw_version);
+	}else if((isChrome56) && document.getElementById("FormTitle") && fw_version >= 7.5){
+		document.getElementById("FormTitle").className = "FormTitle";
+		//console.log("chrome", fw_version);
+	}
+	//firefox
+	var isFirefox = navigator.userAgent.search("Firefox") > -1;
+	if((isFirefox) && document.getElementById("FormTitle") && fw_version < 7.5){
+		document.getElementById("FormTitle").className = "FormTitle_firefox";
+		if(current_url.indexOf("Main_Ss_Content.asp") == 0){
+			document.getElementById("FormTitle").style.marginTop = "-100px"
+			//console.log("firefox -100");
+		}
+
+	}else if((isFirefox) && document.getElementById("FormTitle") && fw_version >= 7.5){
+		document.getElementById("FormTitle").className = "FormTitle_firefox";
+		if(current_url.indexOf("Main_Ss_Content.asp") == 0){
+			document.getElementById("FormTitle").style.marginTop = "0px"		
+			//console.log("firefox 0");
+		}
+
+	}
+}
+
+function menu_hook(title, tab) {
+	browser_compatibility1();
+	var enable_ss = "<% nvram_get("enable_ss"); %>";
+	var enable_soft = "<% nvram_get("enable_soft"); %>";
+	if(enable_ss == "1" && enable_soft == "1"){
+		tabtitle[tabtitle.length -2] = new Array("", "shadowsocks设置", "负载均衡设置", "Socks5设置");
+		tablink[tablink.length -2] = new Array("", "Main_Ss_Content.asp", "Main_Ss_LoadBlance.asp",  "Main_SsLocal_Content.asp");
+	}else{
+		tabtitle[tabtitle.length -1] = new Array("", "shadowsocks设置", "负载均衡设置", "Socks5设置");
+		tablink[tablink.length -1] = new Array("", "Main_Ss_Content.asp", "Main_Ss_LoadBlance.asp",  "Main_SsLocal_Content.asp");
+	}
+}
+
 function conf_to_obj(){
 	ssmode = document.form.ss_basic_mode.value;
 	if (ssmode == "2" || ssmode == "3" || ssmode == "4"){
@@ -94,6 +145,9 @@ function onSubmitCtrl() {
 	checkss = 10001;
 	$G("ss_state2").innerHTML = "国外连接 - " + "Waiting...";
 	$G("ss_state3").innerHTML = "国内连接 - " + "Waiting...";
+	document.form.ss_basic_server.value = $j.trim($j("#ss_basic_server").val());
+	document.form.ss_basic_port.value = $j.trim($j("#ss_basic_port").val());
+	document.form.ss_basic_password.value = $j.trim($j("#ss_basic_password").val());
     if (validForm()) {
         if (0 == node_global_max) {
             var obj = ssform2obj();
@@ -145,7 +199,7 @@ function update_ss_ui(obj) {
 			}
 			continue;
 		} else if (field == "ss_basic_rss_protocol") {
-			if (obj[field] != "origin" && obj[field] != "verify_simple" && obj[field] != "verify_sha1" && obj[field] != "auth_sha1" && obj[field] != "auth_sha1_v2" && obj[field] != "auth_sha1_v4" && obj[field] != "auth_aes128_md5" && obj[field] != "auth_aes128_sha1" ) {
+			if (obj[field] != "origin" && obj[field] != "verify_simple" && obj[field] != "verify_sha1" && obj[field] != "auth_sha1" && obj[field] != "auth_sha1_v2" && obj[field] != "auth_sha1_v4" && obj[field] != "auth_aes128_md5" && obj[field] != "auth_aes128_sha1" && obj[field] != "auth_chain_a" ) {
 				$j("#ss_basic_rss_protocol").val("origin");
 			} else {
 				$j("#ss_basic_rss_protocol").val(obj.ss_basic_rss_protocol);
@@ -188,7 +242,7 @@ function update_ss_ui(obj) {
 	}
 	$j("#ss_basic_method").val(obj.ss_basic_method);
 	$G("ss_basic_password").value = Base64.decode($G("ss_basic_password").value);
-	
+
 }
 
 function validForm() {
@@ -241,7 +295,7 @@ function update_visibility_main() {
 		$j("#ss_title").html("shadowsocks - 账号信息配置");
 	} else if (ssmode == "4"){
 		$j("#mode_state").html("SS运行状态【游戏模式V2】");
-		$j("#head_illustrate").html("<i>说明：</i>游戏模式V2需要架设自己的游戏模式V2服务器才能使用。&nbsp;&nbsp;<a href='http://koolshare.io/koolgame/latest/' target='_blank'><i><u>服务器端下载</u></i></a>&nbsp;&nbsp;<a style='margin-left: 20px;' href='https://koolshare.cn/thread-38263-1-1.html' target='_blank'><i><u>&nbsp;游戏模式v2服务器一键安装脚本</u></i></a>");
+		$j("#head_illustrate").html("<i>说明：</i>游戏模式V2是koolshare小宝为游戏玩家专门开发的加速软件，并针对udp包专门优化。&nbsp;&nbsp;<a style='margin-left: 20px;' href='https://github.com/clangcn/game-server' target='_blank'><i><u>&nbsp;游戏模式v2服务器一键安装脚本</u></i></a>");
 		$j("#ss_switch").html("<a class='hintstyle' href='javascript:void(0);' onclick='openssHint(10)'>游戏模式V2 开关</a>");
 		$j("#ss_title").html("游戏模式V2 - 账号信息配置");
 	} else if (ssmode == "5"){
@@ -265,12 +319,14 @@ function update_visibility_main() {
 	//开启ssr，开启游戏模式，游戏模式v2，开启kcp协议，都将不支持ss-libev的混淆，因此不予显示
 	showhide("ss_obfs", (sur != "1" && ssmode != "4" && suk !="1"));
 	showhide("ss_obfs_host", (sur != "1" && ssmode != "4" && suk !="1" && document.form.ss_basic_ss_obfs.value != "0"));
-	showhide("ss_obfs_support", ($j("#ss_node_table_mode").val() != "3"));
-	showhide("ss_obfs_host_support", ($j("#ss_node_table_mode").val() != "3" && $j("#ss_node_table_ss_obfs").val() != "0"));
+	if (save_flag == "shadowsocks"){
+		showhide("ss_obfs_support", ($j("#ss_node_table_mode").val() != "3"));
+		showhide("ss_obfs_host_support", ($j("#ss_node_table_mode").val() != "3" && $j("#ss_node_table_ss_obfs").val() != "0"));
+	}
 	showhide("SSR_name", (ssmode != "4" && document.getElementById("ss_basic_ss_obfs").value == "0" ));
 	showhide("KCP_name", (ssmode != "3" && ssmode != "4" && document.form.ss_basic_ss_obfs.value =="0"));
 	showhide("ss_basic_rss_protocol_tr", (sur == "1" && ssmode != "4"));
-	showhide("ss_basic_rss_protocol_para_tr", (sur == "1" && ssmode != "4" && srp == "auth_aes128_md5" || srp == "auth_aes128_sha1"));
+	showhide("ss_basic_rss_protocol_para_tr", (sur == "1" && ssmode != "4" && document.getElementById("ss_basic_rss_protocol_para").value != ""));
 	showhide("ss_basic_rss_obfs_tr", (sur == "1" && ssmode != "4"));
 	showhide("ss_basic_ticket_tr", (sur == "1" && ssmode != "4" && document.form.ss_basic_rss_obfs.value == "tls1.2_ticket_auth" || document.form.ss_basic_rss_obfs.value == "http_simple" || document.form.ss_basic_rss_obfs.value == "http_post" ));
 	showhide("ss_basic_kcp_port_tr", (suk == "1" && ssmode!== "4" && ssmode!== "3" ));
@@ -363,6 +419,7 @@ function update_visibility_tab2(){
 	}else if (document.form.ss_dns_plan.value == "2"){
 		$j("#ss_dns_plan_note").html("国内dns解析cdn名单内的国内域名，剩下的域名用国外dns解析。");
 	}
+
 }
 
 function generate_lan_list(){
@@ -678,7 +735,7 @@ function Add_profile(){ //点击节点页面内添加节点动作
 	$G("add_node").style.display = "";
 	$G("edit_node").style.display = "none";
 	$G("continue_add").style.display = "";
-	$G("vpnc_settings").style.position = "fixed";
+	//$G("vpnc_settings").style.position = "fixed";
 	scroll_bottoom();
 	$j("#vpnc_settings").fadeIn(200);
 	update_visibility_main();
@@ -761,20 +818,21 @@ function add_ss_node_conf(flag) { //点击添加按钮动作
 	var params3 = ["name", "server", "mode", "port", "method", "koolgame_udp"]; //for ssr
 	if (flag == 'shadowsocks') {
 		for (var i = 0; i < params1.length; i++) {
-			ns[p + "_" + params1[i] + "_" + node_global_max] = $j('#ss_node_table' + "_" + params1[i]).val();
+			ns[p + "_" + params1[i] + "_" + node_global_max] = $j.trim($j('#ss_node_table' + "_" + params1[i]).val());
+			ns[p + "_password_" + node_global_max] = Base64.encode($j.trim($j("#ss_node_table_password").val()));
 			ns[p + "_use_rss_" + node_global_max] = 0;
-			ns[p + "_password_" + node_global_max] = Base64.encode($j("#ss_node_table_password").val());
+			
 		}
 	} else if (flag == 'shadowsocksR') {
 		for (var i = 0; i < params2.length; i++) {
-			ns[p + "_" + params2[i] + "_" + node_global_max] = $j('#ss_node_table' + "_" + params2[i]).val();
-			ns[p + "_password_" + node_global_max] = Base64.encode($j("#ss_node_table_password").val());
+			ns[p + "_" + params2[i] + "_" + node_global_max] = $j.trim($j('#ss_node_table' + "_" + params2[i]).val());
+			ns[p + "_password_" + node_global_max] = Base64.encode($j.trim($j("#ss_node_table_password").val()));
 			ns[p + "_use_rss_" + node_global_max] = 1;
 		}
 	} else if (flag == 'gameV2') {
 		for (var i = 0; i < params3.length; i++) {
-			ns[p + "_" + params3[i] + "_" + node_global_max] = $j('#ss_node_table' + "_" + params3[i]).val();
-			ns[p + "_password_" + node_global_max] = Base64.encode($j("#ss_node_table_password").val());
+			ns[p + "_" + params3[i] + "_" + node_global_max] = $j.trim($j('#ss_node_table' + "_" + params3[i]).val());
+			ns[p + "_password_" + node_global_max] = Base64.encode($j.trim($j("#ss_node_table_password").val()));
 			ns[p + "_use_rss_" + node_global_max] = 0;
 		}
 	}
@@ -804,9 +862,8 @@ function add_ss_node_conf(flag) { //点击添加按钮动作
 				document.form.ss_node_table_rss_protocol_para.value = "";
 				document.form.ss_node_table_rss_obfs.value = "plain";
 				document.form.ss_node_table_koolgame_udp.value = "0";
-				//updateSs_node_listView();
+				cancel_add_rule();
 			}
-
 		}
 	});
 }
@@ -830,119 +887,107 @@ function refresh_table() {
 			$j.globalEval(response);
 			$j("#ss_node_list_table_main").find("tr:gt(0)").remove();
 			$j('#ss_node_list_table_main tr:last').after(refresh_html());
+		//setTimeout("refresh_table();", 100);
+			
 		}
 	});
 }
 function refresh_html() {
-
-	var isChrome = navigator.userAgent.search("Chrome") > -1;
-		if(isChrome){
-		var major = navigator.userAgent.match("Chrome\/([0-9]*)\.");    //check for major version
-		var isChrome56 = (parseInt(major[1], 10) >= 56);
-	}
-	if((isChrome56) && document.getElementById("FormTitle")){
-		document.getElementById("FormTitle").className = "FormTitle_chrome56";
-	}
+	browser_compatibility1();
 	confs = getAllConfigs();
 	var n = 0;
 	for (var i in confs) {
 		n++;
 	} //获取节点的数目
-	if (eval(n) > "12") { //当节点数目大于12个的时候，显示为overflow，节点可以滚动
-			$G("ss_node_list_table_th").style.top = "246px";
-			$G("ss_node_list_table_td").style.top = "286px";
-			$G("ss_node_list_table_td").style.height = "613px";
-			$G("ss_node_list_table_btn").style.top = "896px";
-			$G("FormTitle").style.height = "1100px";	
+	if (eval(n) > "14.5") { //当节点数目大于13个的时候，显示为overflow，节点可以滚动
 		if (isFirefox = navigator.userAgent.indexOf("Firefox") > 0) {
-			$G("ss_node_list_table_th").style.top = "400px";
-			$G("ss_node_list_table_td").style.top = "440px";
-			$G("ss_node_list_table_td").style.height = "613px";
-			$G("ss_node_list_table_btn").style.top = "1050px";
-			$G("FormTitle").style.height = "1100px";
-		}
-		if(isChrome56){
+			$G("ss_node_list_table_th").style.top = "396px";
+			$G("ss_node_list_table_td").style.top = "436px";
+			$G("ss_node_list_table_td").style.height = "561px";
+			$G("ss_node_list_table_btn").style.top = "1001px";
+		}else{ 
 			$G("ss_node_list_table_th").style.top = "244px";
 			$G("ss_node_list_table_td").style.top = "284px";
-			$G("ss_node_list_table_td").style.height = "613px";
-			$G("ss_node_list_table_btn").style.top = "894px";
-			$G("FormTitle").style.height = "1100px";
+			$G("ss_node_list_table_td").style.height = "561px";
+			$G("ss_node_list_table_btn").style.top = "849px";
 		}
-
 		$G("ss_node_list_table_th").style.display = "";
 		$G("ss_node_list_table_td").style.overflow = "auto";
 		$G("ss_node_list_table_td").style.position = "absolute";
+		$j('#ss_node_list_table_btn').css('margin','');
 		$G("ss_node_list_table_btn").style.position = "absolute";
 		$G("ss_node_list_table_btn").style.bottom = "13px";
-		$G("ss_node_list_table_main").style.margin = "0px 0px 0px 0px";
 		$G("hide_when_folw").style.display = "none";
-	} else {
-		$G("ss_node_list_table_th").style.top = "242px";
-		$G("ss_node_list_table_td").style.top = "282px";
-		$G("ss_node_list_table_td").style.bottom = "190px";
+	} else { //当节点数量小于等于13个的是否，显示为absolute，节点不可滚动
 		$G("ss_node_list_table_th").style.display = "none";
+		$G("ss_node_list_table_th").style.top = "242px";
+		$j('#ss_node_list_table_td').css('height','');
+		$G("ss_node_list_table_td").style.top = "282px";
+		$G("ss_node_list_table_td").style.margin = "-1px 0px 0px 0px";
 		$G("ss_node_list_table_td").style.overflow = "visible";
 		$G("ss_node_list_table_td").style.position = "static";
+		$j('#ss_node_list_table_btn').css('bottom','');
+		$j('#ss_node_list_table_btn').css('top','');
 		$G("ss_node_list_table_btn").style.position = "static";
-		$G("ss_node_list_table_main").style.margin = "-1px 0px 0px 0px";
+		$G("ss_node_list_table_btn").style.margin = "4px 0px 0px 0px";
 		$G("hide_when_folw").style.display = "";
 	}
 	var html = '';
 	for (var field in confs) {
 		var c = confs[field];
-		html = html + '<tr style="height:51px">';
+		html = html + '<tr style="height:40px">';
 		if (c["mode"] == 1) {
-			html = html + '<td style="width:45px"><img src="/res/gfw.png"th/></td>';
+			html = html + '<td style="width:40px"><img style="margin:-4px -4px -4px -4px;" src="/res/gfw.png"/></td>';
 		} else if (c["mode"] == 2) {
-			html = html + '<td style="width:45px"><img src="/res/chn.png"th/></td>';
+			html = html + '<td style="width:40px"><img style="margin:-4px -4px -4px -4px;" src="/res/chn.png"/></td>';
 		} else if (c["mode"] == 3) {
-			html = html + '<td style="width:45px"><img src="/res/game.png"th/></td>';
+			html = html + '<td style="width:40px"><img style="margin:-4px -4px -4px -4px;" src="/res/game.png"/></td>';
 		} else if (c["mode"] == 4) {
-			html = html + '<td style="width:45px"><img src="/res/gameV2.png"th/></td>';
+			html = html + '<td style="width:40px"><img style="margin:-4px -4px -4px -4px;" src="/res/gameV2.png"/></td>';
 		} else if (c["mode"] == 5) {
-			html = html + '<td style="width:45px"><img src="/res/all.png"th/></td>';
+			html = html + '<td style="width:40px"><img style="margin:-4px -4px -4px -4px;" src="/res/all.png"/></td>';
 		} else {
-			html = html + '<td style="width:45px"></td>';
+			html = html + '<td style="width:40px"></td>';
 		}
-		html = html + '<td style="width:85px;" id="ss_node_name_' + c["node"] + '">' + c["name"] + '</td>';
-		html = html + '<td style="width:85px;" id="ss_node_server_' + c["node"] + '">' + c["server"] + '</td>';
+		html = html + '<td style="width:90px;" id="ss_node_name_' + c["node"] + '">' + c["name"] + '</td>';
+		html = html + '<td style="width:90px;" id="ss_node_server_' + c["node"] + '">' + c["server"] + '</td>';
 		html = html + '<td id="ss_node_port_' + c["node"] + '" style="width:37px;">' + c["port"] + '</td>';
-		html = html + '<td id="ss_node_method_' + c["node"] + '" style="width:75px;">' + c["method"] + '</td>';
-		html = html + '<td class="data_ping" id="ss_node_ping_' + c["node"] + '" style="width:78px;" id="ping_test_td_' + c["node"] + '" style="text-align: center;">' + c["ping"] + '</td>';
+		html = html + '<td id="ss_node_method_' + c["node"] + '" style="width:90px;">' + c["method"] + '</td>';
+		html = html + '<td id="ss_node_ping_' + c["node"] + '" style="width:78px;" id="ping_test_td_' + c["node"] + '" style="text-align: center;">' + c["ping"] + '</td>';
 		if (c["mode"] == 4) {
-			html = html + '<td class="data_webtest" id="ss_node_webtest_' + c["node"] + '" style="width:36px;" id="web_test_td_' + c["node"] + '">' + '不支持' + '</td>';
+			html = html + '<td id="ss_node_webtest_' + c["node"] + '" style="width:36px;" id="web_test_td_' + c["node"] + '">' + '不支持' + '</td>';
 		} else {
-			html = html + '<td class="data_webtest" id="ss_node_webtest_' + c["node"] + '" style="width:36px;" id="web_test_td_' + c["node"] + '">' + c["webtest"] + '</td>';
+			html = html + '<td id="ss_node_webtest_' + c["node"] + '" style="width:36px;" id="web_test_td_' + c["node"] + '">' + c["webtest"] + '</td>';
 		}
 		html = html + '<td style="width:33px;">'
-		html = html + '<input style="margin-left:-3px;" id="dd_node_' + c["node"] + '" class="edit_btn" type="button" onclick="return edit_conf_table(this);" value="">'
+		html = html + '<input style="style="margin:-4px 0px -4px -3px;" id="dd_node_' + c["node"] + '" class="edit_btn" type="button" onclick="return edit_conf_table(this);" value="">'
 		html = html + '</td>';
 		html = html + '<td style="width:33px;">'
 		if ((c["node"]) == db_ss["ssconf_basic_node"]) {
-			html = html + '<input style="margin-top: 4px;margin-left:-3px;" id="td_node_' + c["node"] + '" class="remove_btn" type="button" onclick="remove_running_node(this);" value="">'
+			html = html + '<input style="margin:0px 0px -4px -3px;" id="td_node_' + c["node"] + '" class="remove_btn" type="button" onclick="remove_running_node(this);" value="">'
 		} else {
-			html = html + '<input style="margin-top: 4px;margin-left:-3px;" id="td_node_' + c["node"] + '" class="remove_btn" type="button" onclick="return remove_conf_table(this);" value="">'
+			html = html + '<input style="margin:0px 0px -4px -3px;" id="td_node_' + c["node"] + '" class="remove_btn" type="button" onclick="return remove_conf_table(this);" value="">'
 		}
 		html = html + '</td>';
-		html = html + '<td style="width:85px;">'
+		html = html + '<td style="width:65px;">'
 		if ((c["node"]) == db_ss["ssconf_basic_node"]) {
 			if (c["use_rss"] == "1") {
-				html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="button_gen_short" style="color: #f072a5;" onclick="apply_Running_node(this);" value="Running">'
+				html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="ss_btn" style="color: #f072a5;width:66px;cursor:pointer;" onclick="apply_Running_node(this);" value="Running">'
 			} else {
 				if (c["koolgame_udp"] == "0" || c["koolgame_udp"] == "1") {
-					html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="button_gen_short" style="color: #33CC33;" onclick="apply_Running_node(this);" value="Running">'
+					html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="ss_btn" style="color: #33CC33;width:66px;cursor:pointer;" onclick="apply_Running_node(this);" value="Running">'
 				} else {
-					html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="button_gen_short" style="color: #00CCFF;" onclick="apply_Running_node(this);" value="Running">'
+					html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="ss_btn" style="color: #00CCFF;width:66px;cursor:pointer;" onclick="apply_Running_node(this);" value="Running">'
 				}
 			}
 		} else {
 			if (c["use_rss"] == "1") {
-				html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="button_gen_short" style="color: #f072a5;" onclick="apply_this_ss_node(this);" value="Apply">'
+				html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="ss_btn" style="color: #f072a5;width:66px;cursor:pointer;" onclick="apply_this_ss_node(this);" value="Apply">'
 			} else {
 				if (c["koolgame_udp"] == "0" || c["koolgame_udp"] == "1") {
-					html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="button_gen_short" style="color: #33CC33;" onclick="apply_this_ss_node(this);" value="Apply">'
+					html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="ss_btn" style="color: #33CC33;width:66px;cursor:pointer;" onclick="apply_this_ss_node(this);" value="Apply">'
 				} else {
-					html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="button_gen_short" style="color: #00CCFF;" onclick="apply_this_ss_node(this);" value="Apply">'
+					html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="ss_btn" style="color: #00CCFF;width:66px;cursor:pointer;" onclick="apply_this_ss_node(this);" value="Apply">'
 				}
 			}
 		}
@@ -1039,71 +1084,66 @@ function hide_text() {
 }
 
 function refresh_html1() {
+	browser_compatibility1();
 	confs = getAllConfigs();
 	var n = 0;
 	for (var i in confs) {
 		n++;
 	} //获取节点的数目
-	var random = parseInt(Math.random() * 7);
-	var phrase = ["koolshare", "你猜", "假节点", "我是马赛克", "我是节点", "火星节点", "引力波节点"];
-	if (eval(n) > "12") { //当节点数目大于12个的时候，显示为overflow，节点可以滚动
-			$G("ss_node_list_table_th").style.top = "246px";
-			$G("ss_node_list_table_td").style.top = "286px";
-			$G("ss_node_list_table_td").style.height = "613px";
-			$G("ss_node_list_table_btn").style.top = "896px";
-			$G("FormTitle").style.height = "1100px";	
+	var random = parseInt(Math.random() * 6);
+	var phrase = ["koolshare", "你猜", "假节点", "我是马赛克", "我是节点", "引力波节点"];
+	if (eval(n) > "14.5") { //当节点数目大于13个的时候，显示为overflow，节点可以滚动
 		if (isFirefox = navigator.userAgent.indexOf("Firefox") > 0) {
-			$G("ss_node_list_table_th").style.top = "400px";
-			$G("ss_node_list_table_td").style.top = "440px";
-			$G("ss_node_list_table_td").style.height = "613px";
-			$G("ss_node_list_table_btn").style.top = "1050px";
-			$G("FormTitle").style.height = "1100px";
-		}
-		if(isChrome56){
+			$G("ss_node_list_table_th").style.top = "246px";
+			$G("ss_node_list_table_td").style.top = "284px";
+			$G("ss_node_list_table_td").style.height = "561px";
+			$G("ss_node_list_table_btn").style.top = "839px";
+		}else{ 
 			$G("ss_node_list_table_th").style.top = "244px";
 			$G("ss_node_list_table_td").style.top = "284px";
-			$G("ss_node_list_table_td").style.height = "613px";
-			$G("ss_node_list_table_btn").style.top = "894px";
-			$G("FormTitle").style.height = "1100px";
+			$G("ss_node_list_table_td").style.height = "561px";
+			$G("ss_node_list_table_btn").style.top = "849px";
 		}
-
 		$G("ss_node_list_table_th").style.display = "";
 		$G("ss_node_list_table_td").style.overflow = "auto";
 		$G("ss_node_list_table_td").style.position = "absolute";
+		$j('#ss_node_list_table_btn').css('margin','');
 		$G("ss_node_list_table_btn").style.position = "absolute";
 		$G("ss_node_list_table_btn").style.bottom = "13px";
-		$G("ss_node_list_table_main").style.margin = "0px 0px 0px 0px";
 		$G("hide_when_folw").style.display = "none";
-	} else {
-		$G("ss_node_list_table_th").style.top = "242px";
-		$G("ss_node_list_table_td").style.top = "282px";
-		$G("ss_node_list_table_td").style.bottom = "190px";
+	} else { //当节点数量小于等于13个的是否，显示为absolute，节点不可滚动
 		$G("ss_node_list_table_th").style.display = "none";
+		$G("ss_node_list_table_th").style.top = "242px";
+		$j('#ss_node_list_table_td').css('height','');
+		$G("ss_node_list_table_td").style.top = "282px";
+		$G("ss_node_list_table_td").style.margin = "-1px 0px 0px 0px";
 		$G("ss_node_list_table_td").style.overflow = "visible";
 		$G("ss_node_list_table_td").style.position = "static";
+		$j('#ss_node_list_table_btn').css('bottom','');
+		$j('#ss_node_list_table_btn').css('top','');
 		$G("ss_node_list_table_btn").style.position = "static";
-		$G("ss_node_list_table_main").style.margin = "-1px 0px 0px 0px";
+		$G("ss_node_list_table_btn").style.margin = "4px 0px 0px 0px";
 		$G("hide_when_folw").style.display = "";
 	}
 	var html = '';
 	for (var field in confs) {
 		var c = confs[field];
-		html = html + '<tr style="height:51px">';
+		html = html + '<tr style="height:40px">';
 		if (c["mode"] == 1) {
-			html = html + '<td style="width:45px;"><img src="/res/gfw.png"th/></td>';
+			html = html + '<td style="width:45px;"><img style="margin:-4px 0px -4px 0px;" src="/res/gfw.png"/></td>';
 		} else if (c["mode"] == 2) {
-			html = html + '<td style="width:45px;"><img src="/res/chn.png"th/></td>';
+			html = html + '<td style="width:45px"><img style="margin:-4px 0px -4px 0px;" src="/res/chn.png"/></td>';
 		} else if (c["mode"] == 3) {
-			html = html + '<td style="width:45px;"><img src="/res/game.png"th/></td>';
+			html = html + '<td style="width:45px"><img style="margin:-4px 0px -4px 0px;" src="/res/game.png"/></td>';
 		} else if (c["mode"] == 4) {
-			html = html + '<td style="width:45px;"><img src="/res/gameV2.png"th/></td>';
+			html = html + '<td style="width:45px"><img style="margin:-4px 0px -4px 0px;" src="/res/gameV2.png"/></td>';
 		} else if (c["mode"] == 5) {
-			html = html + '<td style="width:45px;"><img src="/res/all.png"th/></td>';
+			html = html + '<td style="width:45px"><img style="margin:-4px 0px -4px 0px;" src="/res/all.png"/></td>';
 		} else {
-			html = html + '<td style="width:45px;"></td>';
+			html = html + '<td style="width:45px"></td>';
 		}
-		html = html + '<td id="ss_node_name_' + c["node"] + '" style="width:85px;">' + phrase[random] + c["node"] + '</td>';
-		html = html + '<td id="ss_node_server_' + c["node"] + '" style="width:85px;">你猜' + c["node"] + '</td>';
+		html = html + '<td id="ss_node_name_' + c["node"] + '" style="width:90px;">' + phrase[random] + c["node"] + '</td>';
+		html = html + '<td id="ss_node_server_' + c["node"] + '" style="width:90px;">你猜' + c["node"] + '</td>';
 		html = html + '<td id="ss_node_port_' + c["node"] + '" style="width:37px;">23333</td>';
 		html = html + '<td id="ss_node_method_' + c["node"] + '" style="width:75px;">666666</td>';
 		html = html + '<td id="ss_node_ping_' + c["node"] + '" style="width:78px;" id="ping_test_td_' + c["node"] + '" style="text-align: center;">' + c["ping"] + '</td>';
@@ -1113,34 +1153,34 @@ function refresh_html1() {
 			html = html + '<td id="ss_node_webtest_' + c["node"] + '" style="width:36px;" id="web_test_td_' + c["node"] + '">' + c["webtest"] + '</td>';
 		}
 		html = html + '<td style="width:33px;">'
-		html = html + '<input style="margin-left:-3px;" id="dd_node_' + c["node"] + '" class="edit_btn" type="button" onclick="return edit_conf_table(this);" value="">'
+		html = html + '<input style="style="margin:-4px 0px -4px -3px;" id="dd_node_' + c["node"] + '" class="edit_btn" type="button" onclick="return edit_conf_table(this);" value="">'
 		html = html + '</td>';
 		html = html + '<td style="width:33px;">'
 		if ((c["node"]) == db_ss["ssconf_basic_node"]) {
-			html = html + '<input style="margin-top: 4px;margin-left:-3px;" id="td_node_' + c["node"] + '" class="remove_btn" type="button" onclick="remove_running_node(this);" value="">'
+			html = html + '<input style="margin:0px 0px -4px -3px;" id="td_node_' + c["node"] + '" class="remove_btn" type="button" onclick="remove_running_node(this);" value="">'
 		} else {
-			html = html + '<input style="margin-top: 4px;margin-left:-3px;" id="td_node_' + c["node"] + '" class="remove_btn" type="button" onclick="return remove_conf_table(this);" value="">'
+			html = html + '<input style="margin:0px 0px -4px -3px;" id="td_node_' + c["node"] + '" class="remove_btn" type="button" onclick="return remove_conf_table(this);" value="">'
 		}
 		html = html + '</td>';
-		html = html + '<td style="width:85px;">'
+		html = html + '<td style="width:75px;">'
 		if ((c["node"]) == db_ss["ssconf_basic_node"]) {
 			if (c["use_rss"] == "1") {
-				html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="button_gen_short" style="color: #f072a5;" onclick="apply_Running_node(this);" value="Running">'
+				html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="ss_btn" style="color: #f072a5;width:66px;cursor:pointer;" onclick="apply_Running_node(this);" value="Running">'
 			} else {
 				if (c["koolgame_udp"] == "0" || c["koolgame_udp"] == "1") {
-					html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="button_gen_short" style="color: #33CC33;" onclick="apply_Running_node(this);" value="Running">'
+					html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="ss_btn" style="color: #33CC33;width:66px;cursor:pointer;" onclick="apply_Running_node(this);" value="Running">'
 				} else {
-					html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="button_gen_short" style="color: #00CCFF;" onclick="apply_Running_node(this);" value="Running">'
+					html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="ss_btn" style="color: #00CCFF;width:66px;cursor:pointer;" onclick="apply_Running_node(this);" value="Running">'
 				}
 			}
 		} else {
 			if (c["use_rss"] == "1") {
-				html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="button_gen_short" style="color: #f072a5;" onclick="apply_this_ss_node(this);" value="Apply">'
+				html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="ss_btn" style="color: #f072a5;width:66px;cursor:pointer;" onclick="apply_this_ss_node(this);" value="Apply">'
 			} else {
 				if (c["koolgame_udp"] == "0" || c["koolgame_udp"] == "1") {
-					html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="button_gen_short" style="color: #33CC33;" onclick="apply_this_ss_node(this);" value="Apply">'
+					html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="ss_btn" style="color: #33CC33;width:66px;cursor:pointer;" onclick="apply_this_ss_node(this);" value="Apply">'
 				} else {
-					html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="button_gen_short" style="color: #00CCFF;" onclick="apply_this_ss_node(this);" value="Apply">'
+					html = html + '<input id="apply_ss_node_' + c["node"] + '" type="button" class="ss_btn" style="color: #00CCFF;width:66px;cursor:pointer;" onclick="apply_this_ss_node(this);" value="Apply">'
 				}
 			}
 		}
@@ -1169,7 +1209,8 @@ function remove_conf_table(o) { //删除节点功能
 			console.log("error in posting config of table");
 		},
 		success: function(response) {
-			refresh_table();
+		//setTimeout("refresh_table();", 100);
+		refresh_table();
 		}
 	});
 }
@@ -1650,7 +1691,7 @@ function toggle_func() {
 			$G("tablet_6").style.display = "none";
 			$G("tablet_7").style.display = "none";
 			$G("apply_button").style.display = "";
-			$G("cmdBtn").value = "提交";
+			//$G("cmdBtn").value = "提交";
 			document.form.ss_basic_action.value = 1;
 			update_visibility_main();
 			ss_node_info_return();
@@ -1697,7 +1738,7 @@ function toggle_func() {
 			$G("tablet_6").style.display = "none";
 			$G("tablet_7").style.display = "none";
 			$G("apply_button").style.display = "";
-			$G("cmdBtn").value = "应用DNS设定";
+			//$G("cmdBtn").value = "应用DNS设定";
 			update_visibility_tab2();
 			document.form.ss_basic_action.value = 2;
 			ss_node_info_return();
@@ -1722,7 +1763,7 @@ function toggle_func() {
 			showhide("ss_wan_black_ip_tr", (ssmode != "5"));
 			showhide("ss_wan_black_domain_tr", (ssmode != "5"));
 			$G("apply_button").style.display = "";
-			$G("cmdBtn").value = "应用黑白名单";
+			//$G("cmdBtn").value = "应用黑白名单";
 			document.form.ss_basic_action.value = 3;
 			ss_node_info_return();
 		});
@@ -1743,7 +1784,7 @@ function toggle_func() {
 			$G("tablet_5").style.display = "none";
 			$G("tablet_6").style.display = "none";
 			$G("tablet_7").style.display = "none";
-			$G("apply_button").style.display = "none";
+			//$G("apply_button").style.display = "none";
 			update_visibility_tab4();
 			ss_node_info_return();
 		});
@@ -1765,7 +1806,7 @@ function toggle_func() {
 			$G("tablet_6").style.display = "none";
 			$G("tablet_7").style.display = "none";
 			$G("apply_button").style.display = "";
-			$G("cmdBtn").value = "提交";
+			//$G("cmdBtn").value = "提交";
 			ss_node_info_return();
 			if (ssmode == 4) {
 				$G("ACL_table_game").style.display = ""
@@ -1800,7 +1841,7 @@ function toggle_func() {
 			$G("tablet_6").style.display = "";
 			$G("tablet_7").style.display = "none";
 			$G("apply_button").style.display = "";
-			$G("cmdBtn").value = "应用附加功能";
+			//$G("cmdBtn").value = "应用附加功能";
 			document.form.ss_basic_action.value = 4;
 			update_visibility_tab4();
 			ss_node_info_return();
@@ -1899,9 +1940,13 @@ function checkCmdRet2() {
 				retArea.value = response.replace("XU6J03M6", " ");
 				$G("ok_button").style.display = "";
 				retArea.scrollTop = retArea.scrollHeight;
-				x = 6;
-				count_down_close();
-				return true;
+				if (document.form.ss_basic_action.value == 4){
+					refreshpage();
+				}else{
+					x = 6;
+					count_down_close();
+					return true;
+				}
 			} else {
 				$G("ok_button").style.display = "none";
 			}
@@ -2189,7 +2234,7 @@ function refresh_acl_html() {
 	} else {
 		code = code + '<td>其它主机</td>';
 	}
-	code = code + '<td>缺省规则</td>';
+	code = code + '<td>默认规则</td>';
 	if (n == 0) {
 		ssmode = document.form.ss_basic_mode.value;
 		if (ssmode == 0) {
@@ -2331,7 +2376,8 @@ function write_proc_status(){
 		<div id="loading_block3" style="margin:10px auto;margin-left:10px;width:85%; font-size:12pt;"></div>
 		<div id="loading_block2" style="margin:10px auto;width:95%;"></div>
 		<div id="log_content2" style="margin-left:15px;margin-right:15px;margin-top:10px;overflow:hidden">
-			<textarea cols="63" rows="21" wrap="on" readonly="readonly" id="log_content3" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="border:1px solid #000;width:99%; font-family:'Courier New', Courier, mono; font-size:11px;background:#000;color:#FFFFFF;"></textarea>
+			<textarea cols="63" rows="21" wrap="on" readonly="readonly" id="log_content3" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="border:1px solid #000;width:99%; font-family:'Courier New', Courier, mono; font-size:11px;background:#000;color:#FFFFFF;">
+			</textarea>
 		</div>
 		<div id="ok_button" class="apply_gen" style="background: #000;display: none;">
 			<input id="ok_button1" class="button_gen" type="button" onclick="hideSSLoadingBar()" value="确定">
@@ -2351,7 +2397,6 @@ function write_proc_status(){
 <input type="hidden" name="action_wait" value="6"/>
 <input type="hidden" name="first_time" value=""/>
 <input type="hidden" name="vpnc_type" value="">
-<input type="hidden" id="ss_ACL_txt" name="ss_ACL_txt" value='<% dbus_get_def("ss_ACL_txt", ""); %>'/>
 <input type="hidden" id="ss_basic_enable" name="ss_basic_enable" value="0" />
 <input type="hidden" id="ss_basic_action" name="ss_basic_action" value="1" />
 <input type="hidden" id="ss_dns_plan_chn" name="ss_dns_plan_chn" value="2" />
@@ -2360,17 +2405,16 @@ function write_proc_status(){
 <input type="hidden" name="preferred_lang" id="preferred_lang" value="<% nvram_get("preferred_lang"); %>"/>
 <input type="hidden" name="SystemCmd" value=""/>
 <input type="hidden" name="firmver" value="<% nvram_get("firmver"); %>"/>
-<div>
-<table class="content" style="margin:auto;" align="center" cellspacing="0">
+<table class="content" align="center" cellpadding="0" cellspacing="0">
 	<tr>
 		<td width="17">&nbsp;</td>
 		<!--=====Beginning of Main Menu=====-->
 		<td valign="top" width="202">
-			<div id="mainMenu" style="margin-top:-171px;"></div>
+			<div id="mainMenu"></div>
 			<div id="subMenu"></div>
 		</td>
 		<td valign="top">
-			<div id="tabMenu" class="submenuBlock" style="width:768px;"></div>
+			<div id="tabMenu" class="submenuBlock"></div>
 			<!--=====Beginning of Main Content=====-->
 			<table width="98%" border="0" align="left" cellpadding="0" cellspacing="0" id="table_for_all" style="display: block;">
 				<tr>
@@ -2387,11 +2431,12 @@ function write_proc_status(){
 										<div class="SimpleNote"  id="head_illustrate"><i>说明：</i>请在下面的<em>账号设置</em>表格中填入你的shadowsocks账号信息，选择好一个模式，点击提交后就能使用代理服务。</div>
 										<div style="margin-top: 0px;text-align: center;font-size: 18px;margin-bottom: 0px;" class="formfontdesc" id="cmdDesc"></div>
 										<!-- this is the popup area for status -->
-										<div id="detail_status"  class="content_status" style="box-shadow: 3px 3px 10px #000;margin-top: 100px;display: none;">
+										<div id="detail_status"  class="content_status" style="box-shadow: 3px 3px 10px #000;margin-top: 0px;display: none;">
 											<div class="user_title">shadowsocks状态检测</div>
 											<div style="margin-left:15px"><i>&nbsp;&nbsp;目前本功能支持ss相关进程状态和iptables表状态检测。</i></div>
 											<div id="user_tr" style="margin: 10px 10px 10px 10px;width:98%;text-align:center;">
-												<textarea cols="63" rows="36" wrap="off" id="proc_status" style="width:97%;padding-left:10px;padding-right:10px;border:0px solid #222;font-family:'Courier New', Courier, mono; font-size:11px;background: transparent;color:#FFFFFF;outline: none;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+												<textarea cols="63" rows="36" wrap="off" id="proc_status" style="width:97%;padding-left:10px;padding-right:10px;border:0px solid #222;font-family:'Courier New', Courier, mono; font-size:11px;background: transparent;color:#FFFFFF;outline: none;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+												</textarea>
 											</div>
 											<div style="margin-top:5px;padding-bottom:10px;width:100%;text-align:center;">
 												<input class="button_gen" type="button" onclick="close_proc_status();" value="返回主界面">	
@@ -2462,15 +2507,15 @@ function write_proc_status(){
                                     	                <input id="show_btn5" class="show-btn5" style="cursor:pointer" type="button" value="访问控制"/>
                                     	                <input id="show_btn6" class="show-btn6" style="cursor:pointer" type="button" value="附加功能"/>
                                     	                <input id="show_btn7" class="show-btn7" style="cursor:pointer" type="button" value="查看日志"/>
-														<a style="margin-left:10px;" type="button" title="需要FQ才能访问" class="kp_btn" target="_blank" href="https://t.me/joinchat/AAAAAEC7pgV9vPdPcJ4dJw">电报交流</a>
-														<a style="margin-left:10px;" type="button" class="kp_btn" target="_blank" href="https://github.com/onekeyshell/kcptun_for_ss_ssr">一键脚本</a>
+														<a style="margin-left:9px;" type="button" title="需要FQ才能访问" class="kp_btn" target="_blank" href="https://t.me/joinchat/AAAAAEC7pgV9vPdPcJ4dJw">电报交流</a>
+														<a style="margin-left:9px;" type="button" class="kp_btn" target="_blank" href="https://github.com/onekeyshell/kcptun_for_ss_ssr">一键脚本</a>
                                     	            </td>
                                     	        </tr>
 											</table>
 										</div>
 
 
-										<div id="vpnc_settings"  class="contentM_qis" style="box-shadow: 3px 3px 10px #000;margin-top: -65px;">
+										<div id="vpnc_settings"  class="contentM_qis" style="box-shadow: 3px 3px 10px #000;margin-top: 50px;">
 											<table class="QISform_wireless" border=0 align="center" cellpadding="5" cellspacing="0">
 												<tr style="height:32px;">
 													<td>		
@@ -2525,6 +2570,7 @@ function write_proc_status(){
 																<th>加密方式</th>
 																<td>
 																	<select id="ss_node_table_method" name="ss_node_table_method" class="input_option" style="width:350px;margin:0px 0px 0px 2px;">
+																		<option value="none">none</option>
 																		<option value="rc4">rc4</option>
 																		<option value="rc4-md5">rc4-md5</option>
 																		<option value="rc4-md5-6">rc4-md5-6</option>
@@ -2580,6 +2626,7 @@ function write_proc_status(){
 																		<option value="auth_sha1_v4">auth_sha1_v4</option>
 																		<option value="auth_aes128_md5">auth_aes128_md5</option>
 																		<option value="auth_aes128_sha1">auth_aes128_sha1</option>
+																		<option value="auth_chain_a">auth_chain_a</option>
 																	</select>
 																</td>
 															</tr>
@@ -2627,7 +2674,6 @@ function write_proc_status(){
 												<input id="add_node" class="button_gen" type="button" onclick="add_ss_node_conf(save_flag);" value="添加">
 												<input id="edit_node" style="display: none;" class="button_gen" type="button" onclick="edit_ss_node_conf(save_flag);" value="修改">	
 												<a id="continue_add" style="display: none;margin-left: 20px;"><input id="continue_add_box" type="checkbox"  />连续添加</a>
-												
 											</div>	
 										      <!--===================================Ending of vpnc setting Content===========================================-->			
 										</div>
@@ -2690,7 +2736,8 @@ function write_proc_status(){
 												<tr id="method_tr">
 													<th width="35%"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(5)">加密方式</a></th>
 													<td>
-														<select id="ss_basic_method" name="ss_basic_method" style="width:164px;margin:0px 0px 0px 2px;" class="input_option" >
+														<select id="ss_basic_method" name="ss_basic_method" style="width:164px;margin:0px 0px 0px 2px;" class="input_option" onchange="update_visibility_main();">
+															<option value="none">none</option>
 															<option value="rc4">rc4</option>
 															<option value="rc4-md5">rc4-md5</option>
 															<option value="rc4-md5-6">rc4-md5-6</option>
@@ -2756,6 +2803,7 @@ function write_proc_status(){
 															<option class="content_input_fd" value="auth_sha1_v4">auth_sha1_v4</option>
 															<option value="auth_aes128_md5">auth_aes128_md5</option>
 															<option value="auth_aes128_sha1">auth_aes128_sha1</option>
+															<option value="auth_chain_a">auth_chain_a</option>
 														</select>
 														<span id="ss_basic_rss_protocol_alert" style="margin-left:5px;margin-top:-20px;margin-bottom:0px"></span>
 													</td>
@@ -2793,59 +2841,48 @@ function write_proc_status(){
 												<tr id="ss_basic_kcp_parameter_tr" style="display: none;">
 													<th width="35%">KCP参数</th>
 													<td>
-														<textarea style="width:99%; font-family:'Courier New', 'Courier', 'mono'; font-size:12px;background:#576D73;color:#FFFFFF;border:1px solid gray;" id="ss_basic_kcp_parameter" name="ss_basic_kcp_parameter" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" title=""></textarea>
+														<textarea style="width:99%; font-family:'Courier New', 'Courier', 'mono'; font-size:12px;background:#576D73;color:#FFFFFF;border:1px solid gray;" id="ss_basic_kcp_parameter" name="ss_basic_kcp_parameter" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" title="">
+														</textarea>
 													</td>
 												</tr>
 											</table>
 										</div>
 										
-										<div id="ss_node_list_table_th" style="display: none; position: absolute; top: 242px; width: 98.8%;">
+										<div id="ss_node_list_table_th" style="display: none; height:40px; position: absolute; top: 242px; width: 98.8%;">
 											<table style="margin:0px 0px 0px 0px;table-layout:fixed;" width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable1">
 												<tr height="40px">
-													<th style="width:45px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(16)">模式</a></th>
-													<th style="width:85px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(17)">节点名称</a></th>
-													<th style="width:85px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(18)">服务器地址</a></th>
+													<th style="width:40px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(16)">模式</a></th>
+													<th style="width:90px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(17)">节点名称</a></th>
+													<th style="width:90px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(18)">服务器地址</a></th>
 													<th style="width:37px;">端口</th>
-													<th style="width:75px;">加密方式</th>
+													<th style="width:90px;">加密方式</th>
 													<th style="width:78px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(19)">ping/丢包</a></th>
 													<th style="width:36px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(20)">延迟</a></th>
 													<th style="width:33px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(21)">编辑</a></th>
 													<th style="width:33px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(22)">删除</a></th>
-													<th style="width:85px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(23)">使用</a></th>
+													<th style="width:65px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(23)">使用</a></th>
 												</tr>
 											</table>
 										</div>
 										
-										<div id="ss_node_list_table_td"  style="display: none; position: static; top: 282px; bottom: 190px; width: 98.8%; overflow: visible">
+										<div id="ss_node_list_table_td"  style="display: none; position: static; top: 282px; bottom: 190px; width: 98.8%; overflow: visible";>
 											<table id="ss_node_list_table_main" style="margin:0px 0px 0px 0px;" width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable1">
 												<tr id="hide_when_folw" height="40px" style="display: none;">
-													<th style="width:45px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(16)">模式</a></th>
-													<th style="width:85px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(17)">节点名称</a></th>
-													<th style="width:85px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(18)">服务器地址</a></th>
+													<th style="width:40px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(16)">模式</a></th>
+													<th style="width:90px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(17)">节点名称</a></th>
+													<th style="width:90px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(18)">服务器地址</a></th>
 													<th style="width:37px;">端口</th>
-													<th style="width:75px;">加密方式</th>
+													<th style="width:90px;">加密方式</th>
 													<th style="width:78px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(19)">ping/丢包</a></th>
 													<th style="width:36px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(20)">延迟</a></th>
 													<th style="width:33px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(21)">编辑</a></th>
 													<th style="width:33px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(22)">删除</a></th>
-													<th style="width:85px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(23)">使用</a></th>
+													<th style="width:65px;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(23)">使用</a></th>
 												</tr>
 											</table>
 										</div>
 										<div id="ss_node_list_table_btn" style="display: none;position: static;width: 747px;">
-											<table style="margin:10px 0px 0px 0px;" width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
-												<tr>
-													<th style="width:20%;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(24)">导出恢复</a></th>
-													<td>
-														<input type="button" class="ss_btn" style="cursor:pointer;" onclick="download_SS_node();" value="导出配置">
-														<input type="button" class="ss_btn" style="cursor:pointer;" onclick="remove_SS_node();" value="清空配置">
-														<input type="button" class="ss_btn" style="cursor:pointer;" onclick="upload_SS_node();" value="恢复配置">
-
-														<input style="color:#FFCC00;*color:#000;width: 200px;" id="ss_file" type="file" name="file">
-														<img id="loadingicon" style="margin-left:5px;margin-right:5px;display:none;" src="/images/InternetScan.gif">
-														<span id="ss_file_info" style="display:none;">完成</span>
-													</td>
-												</tr>
+											<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
 												<tr>
 													<th style="width:20%;">ping测试</th>
 													<td>
@@ -3077,7 +3114,8 @@ baidu.com
 # 例如hosts设置：
 address=/koolshare.cn/2.2.2.2
 # 防DNS劫持设置：
-bogus-nxdomain=220.250.64.18" rows="12" style="width:99%; font-family:'Courier New', 'Courier', 'mono'; font-size:12px;background:#475A5F;color:#FFFFFF;" id="ss_dnsmasq" name="ss_dnsmasq" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" title=""></textarea>
+bogus-nxdomain=220.250.64.18" rows="12" style="width:99%; font-family:'Courier New', 'Courier', 'mono'; font-size:12px;background:#475A5F;color:#FFFFFF;" id="ss_dnsmasq" name="ss_dnsmasq" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" title="">
+														</textarea>
 													</td>
 												</tr>
 											</table>
@@ -3095,7 +3133,8 @@ bogus-nxdomain=220.250.64.18" rows="12" style="width:99%; font-family:'Courier N
 														<textarea placeholder="# 填入不需要走代理的外网ip地址，一行一个，格式（IP/CIDR）如下
 2.2.2.2
 3.3.3.3
-4.4.4.4/24" cols="50" rows="7" id="ss_wan_white_ip" name="ss_wan_white_ip" style="width:99%; font-family:'Courier New', 'Courier', 'mono'; font-size:12px;background:#475A5F;color:#FFFFFF;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+4.4.4.4/24" cols="50" rows="7" id="ss_wan_white_ip" name="ss_wan_white_ip" style="width:99%; font-family:'Courier New', 'Courier', 'mono'; font-size:12px;background:#475A5F;color:#FFFFFF;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+														</textarea>
 													</td>
 												</tr>
 												<tr id="ss_wan_white_domain_tr">
@@ -3107,7 +3146,8 @@ bogus-nxdomain=220.250.64.18" rows="12" style="width:99%; font-family:'Courier N
 														<textarea placeholder="# 填入不需要走代理的域名，一行一个，格式如下：
 google.com
 facebook.com
-# 需要清空电脑DNS缓存，才能立即看到效果。" cols="50" rows="7" id="ss_wan_white_domain" name="ss_wan_white_domain" style="width:99%; font-family:'Courier New', 'Courier', 'mono'; font-size:12px;background:#475A5F;color:#FFFFFF;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+# 需要清空电脑DNS缓存，才能立即看到效果。" cols="50" rows="7" id="ss_wan_white_domain" name="ss_wan_white_domain" style="width:99%; font-family:'Courier New', 'Courier', 'mono'; font-size:12px;background:#475A5F;color:#FFFFFF;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+														</textarea>
 													</td>
 												</tr>
 												<tr id="ss_wan_black_ip_tr">
@@ -3119,7 +3159,8 @@ facebook.com
 														<textarea placeholder="# 填入需要强制走代理的外网ip地址，一行一个，格式（IP/CIDR）如下：
 5.5.5.5
 6.6.6.6
-7.7.7.7/8" cols="50" rows="7" id="ss_wan_black_ip" name="ss_wan_black_ip" style="width:99%; font-family:'Courier New', 'Courier', 'mono'; font-size:12px;background:#475A5F;color:#FFFFFF;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+7.7.7.7/8" cols="50" rows="7" id="ss_wan_black_ip" name="ss_wan_black_ip" style="width:99%; font-family:'Courier New', 'Courier', 'mono'; font-size:12px;background:#475A5F;color:#FFFFFF;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+														</textarea>
 													</td>
 												</tr>
 												<tr id="ss_wan_black_domain_tr">
@@ -3131,7 +3172,8 @@ facebook.com
 														<textarea placeholder="# 填入需要强制走代理的域名，一行一个，格式如下：
 baidu.com
 taobao.com
-# 需要清空电脑DNS缓存，才能立即看到效果。" cols="50" rows="7" id="ss_wan_black_domain" name="ss_wan_black_domain" style="width:99%; font-family:'Courier New', 'Courier', 'mono'; font-size:12px;background:#475A5F;color:#FFFFFF;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+# 需要清空电脑DNS缓存，才能立即看到效果。" cols="50" rows="7" id="ss_wan_black_domain" name="ss_wan_black_domain" style="width:99%; font-family:'Courier New', 'Courier', 'mono'; font-size:12px;background:#475A5F;color:#FFFFFF;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+														</textarea>
 													</td>
 												</tr>
 											</table>
@@ -3230,8 +3272,10 @@ taobao.com
 														</select>
 													</th>
 													<td>
-														<textarea placeholder="填入需要限制客户端IP如:192.168.1.2,192.168.1.3，每个ip之间用英文逗号隔开" rows=3 style="width:99%; font-family:'Courier New', 'Courier', 'mono'; font-size:12px;background:#475A5F;color:#FFFFFF;border:1px solid gray;" id="ss_game2_black_lan" name="ss_game2_black_lan" title="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
-														<textarea placeholder="填入仅允许的客户端IP如:192.168.1.2,192.168.1.3，每个ip之间用英文逗号隔开" rows=3 style="width:99%; font-family:'Courier New', 'Courier', 'mono'; font-size:12px;background:#475A5F;color:#FFFFFF;border:1px solid gray;" id="ss_game2_white_lan" name="ss_game2_white_lan" title="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+														<textarea placeholder="填入需要限制客户端IP如:192.168.1.2,192.168.1.3，每个ip之间用英文逗号隔开" rows=3 style="width:99%; font-family:'Courier New', 'Courier', 'mono'; font-size:12px;background:#475A5F;color:#FFFFFF;border:1px solid gray;" id="ss_game2_black_lan" name="ss_game2_black_lan" title="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+														</textarea>
+														<textarea placeholder="填入仅允许的客户端IP如:192.168.1.2,192.168.1.3，每个ip之间用英文逗号隔开" rows=3 style="width:99%; font-family:'Courier New', 'Courier', 'mono'; font-size:12px;background:#475A5F;color:#FFFFFF;border:1px solid gray;" id="ss_game2_white_lan" name="ss_game2_white_lan" title="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+														</textarea>
 													</td>
 												</tr>
 												
@@ -3277,8 +3321,8 @@ taobao.com
 											</table>
 											<div id="ACL_note">
 											<div><i>1&nbsp;&nbsp;默认状态下，所有局域网的主机都会走当前节点的模式（主模式），相当于即不启用局域网访问控制。</i></div>
-											<div><i>2&nbsp;&nbsp;当你添加了主机，并设置缺省规则为不通过SS，则只有添加的主机才会走相应的模式。</i></div>
-											<div><i>3&nbsp;&nbsp;当你添加了主机，并设置缺省规则为当前节点的模式，除了添加的主机才会走相应的模式，未添加的主机会走缺省规则的模式。</i></div>
+											<div><i>2&nbsp;&nbsp;当你添加了主机，并设置默认规则为不通过SS，则只有添加的主机才会走相应的模式。</i></div>
+											<div><i>3&nbsp;&nbsp;当你添加了主机，并设置默认规则为当前节点的模式，除了添加的主机才会走相应的模式，未添加的主机会走默认规则的模式。</i></div>
 											<div><i>4&nbsp;&nbsp;如果使用了KCP协议，或者负载均衡，因为它们不支持udp，所以不能控制单个主机走游戏模式。</i></div>
 											</div>
 										</div>
@@ -3338,17 +3382,36 @@ taobao.com
 															<option value="0">resolveip方式</option>
 															<option value="1" selected>nslookup方式</option>
 														</select>
-														<input type="text" class="ssconfig input_ss_table" id="ss_basic_dnslookup_server" name="ss_basic_dnslookup_server" style="width:128px;"  value="119.29.29.29">
+														<input type="text" class="ssconfig input_ss_table" id="ss_basic_dnslookup_server" name="ss_basic_dnslookup_server" style="width:128px;"  value="114.114.114.114">
 														<span id="SS_IP" style="margin-left:auto;margin-top:-23px;margin-bottom:0px;display: none;">
 														</span>
 													</td>
-												</tr>												
+												</tr>
+												<tr>
+													<th style="width:20%;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(24)">导出SS配置</a></th>
+													<td>
+														<input type="button" class="ss_btn" style="cursor:pointer;" onclick="download_SS_node();" value="导出配置">
+														<input type="button" class="ss_btn" style="cursor:pointer;" onclick="remove_SS_node();" value="清空配置">
+													</td>
+												</tr>
+												<tr>
+													<th style="width:20%;"><a class="hintstyle" href="javascript:void(0);" onclick="openssHint(24)">恢复SS配置（支持ss/ssr的json节点）</a></th>
+													<td>
+														<input style="color:#FFCC00;*color:#000;width: 200px;" id="ss_file" type="file" name="file"/>
+														<img id="loadingicon" style="margin-left:5px;margin-right:5px;display:none;" src="/images/InternetScan.gif"/>
+														<span id="ss_file_info" style="display:none;">完成</span>
+														<input type="button" class="ss_btn" style="cursor:pointer;" onclick="upload_SS_node();" value="恢复配置"/>
+													</td>
+												</tr>											
 											</table>
 										</div>
 
 										<!--log_content-->
 										<div id="tablet_7" style="display: none;">
-												<div id="log_content" style="margin-top:-1px;display:none"><textarea cols="63" rows="36" wrap="on" readonly="readonly" id="log_content1" style="width:97%; padding-left:10px; padding-right:10px; border:1px solid #222; font-family:'Courier New', Courier, mono; font-size:11px; background:#475A5F; color:#FFFFFF; outline:none;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea></div>
+												<div id="log_content" style="margin-top:-1px;display:none">
+													<textarea cols="63" rows="36" wrap="on" readonly="readonly" id="log_content1" style="width:97%; padding-left:10px; padding-right:10px; border:1px solid #222; font-family:'Courier New', Courier, mono; font-size:11px; background:#475A5F; color:#FFFFFF; outline:none;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+													</textarea>
+												</div>
 										</div>		
 
 										<div class="apply_gen" id="loading_icon">
@@ -3372,7 +3435,6 @@ taobao.com
 		<td width="10" align="center" valign="top"></td>
 	</tr>
 </table>
-</div>
 </form>
 <div id="footer"></div>
 </body>

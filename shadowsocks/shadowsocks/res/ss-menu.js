@@ -1,13 +1,44 @@
-﻿function menu_hook(title, tab) {
+
+function browser_compatibility1(){
+	//fw versiom
+	var _fw="<% nvram_get("extendno"); %>";
+	fw_version=parseFloat(_fw.split("X")[1]);
+	// chrome
 	var isChrome = navigator.userAgent.search("Chrome") > -1;
-		if(isChrome){
+	if(isChrome){
 		var major = navigator.userAgent.match("Chrome\/([0-9]*)\.");    //check for major version
 		var isChrome56 = (parseInt(major[1], 10) >= 56);
+	} else {
+		var isChrome56 = false;
 	}
-	if((isChrome56) && document.getElementById("FormTitle")){
+	if((isChrome56) && document.getElementById("FormTitle") && fw_version < 7.5){
 		document.getElementById("FormTitle").className = "FormTitle_chrome56";
+		//console.log("fw_version", fw_version);
+	}else if((isChrome56) && document.getElementById("FormTitle") && fw_version >= 7.5){
+		document.getElementById("FormTitle").className = "FormTitle";
+		//console.log("chrome", fw_version);
 	}
+	//firefox
+	var isFirefox = navigator.userAgent.search("Firefox") > -1;
+	if((isFirefox) && document.getElementById("FormTitle") && fw_version < 7.5){
+		document.getElementById("FormTitle").className = "FormTitle_firefox";
+		if(current_url.indexOf("Main_Ss_Content.asp") == 0){
+			document.getElementById("FormTitle").style.marginTop = "-100px"
+			//console.log("firefox -100");
+		}
 
+	}else if((isFirefox) && document.getElementById("FormTitle") && fw_version >= 7.5){
+		document.getElementById("FormTitle").className = "FormTitle_firefox";
+		if(current_url.indexOf("Main_Ss_Content.asp") == 0){
+			document.getElementById("FormTitle").style.marginTop = "0px"		
+			//console.log("firefox 0");
+		}
+
+	}
+}
+
+function menu_hook(title, tab) {
+	browser_compatibility1();
 	var enable_ss = "<% nvram_get("enable_ss"); %>";
 	var enable_soft = "<% nvram_get("enable_soft"); %>";
 	if(enable_ss == "1" && enable_soft == "1"){
@@ -20,13 +51,110 @@
 }
 
 var Base64;
-if(typeof btoa == "Function") {
-   Base64 = {encode:function(e){ return btoa(e); }, decode:function(e){ return atob(e);}};
+if (typeof btoa == "Function") {
+	Base64 = {
+		encode: function(e) {
+			return btoa(e);
+		},
+		decode: function(e) {
+			return atob(e);
+		}
+	};
 } else {
-   Base64 ={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(e){var t="";var n,r,i,s,o,u,a;var f=0;e=Base64._utf8_encode(e);while(f<e.length){n=e.charCodeAt(f++);r=e.charCodeAt(f++);i=e.charCodeAt(f++);s=n>>2;o=(n&3)<<4|r>>4;u=(r&15)<<2|i>>6;a=i&63;if(isNaN(r)){u=a=64}else if(isNaN(i)){a=64}t=t+this._keyStr.charAt(s)+this._keyStr.charAt(o)+this._keyStr.charAt(u)+this._keyStr.charAt(a)}return t},decode:function(e){var t="";var n,r,i;var s,o,u,a;var f=0;e=e.replace(/[^A-Za-z0-9\+\/\=]/g,"");while(f<e.length){s=this._keyStr.indexOf(e.charAt(f++));o=this._keyStr.indexOf(e.charAt(f++));u=this._keyStr.indexOf(e.charAt(f++));a=this._keyStr.indexOf(e.charAt(f++));n=s<<2|o>>4;r=(o&15)<<4|u>>2;i=(u&3)<<6|a;t=t+String.fromCharCode(n);if(u!=64){t=t+String.fromCharCode(r)}if(a!=64){t=t+String.fromCharCode(i)}}t=Base64._utf8_decode(t);return t},_utf8_encode:function(e){e=e.replace(/\r\n/g,"\n");var t="";for(var n=0;n<e.length;n++){var r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r)}else if(r>127&&r<2048){t+=String.fromCharCode(r>>6|192);t+=String.fromCharCode(r&63|128)}else{t+=String.fromCharCode(r>>12|224);t+=String.fromCharCode(r>>6&63|128);t+=String.fromCharCode(r&63|128)}}return t},_utf8_decode:function(e){var t="";var n=0;var r=c1=c2=0;while(n<e.length){r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r);n++}else if(r>191&&r<224){c2=e.charCodeAt(n+1);t+=String.fromCharCode((r&31)<<6|c2&63);n+=2}else{c2=e.charCodeAt(n+1);c3=e.charCodeAt(n+2);t+=String.fromCharCode((r&15)<<12|(c2&63)<<6|c3&63);n+=3}}return t}}
+	Base64 = {
+		_keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+		encode: function(e) {
+			var t = "";
+			var n, r, i, s, o, u, a;
+			var f = 0;
+			e = Base64._utf8_encode(e);
+			while (f < e.length) {
+				n = e.charCodeAt(f++);
+				r = e.charCodeAt(f++);
+				i = e.charCodeAt(f++);
+				s = n >> 2;
+				o = (n & 3) << 4 | r >> 4;
+				u = (r & 15) << 2 | i >> 6;
+				a = i & 63;
+				if (isNaN(r)) {
+					u = a = 64
+				} else if (isNaN(i)) {
+					a = 64
+				}
+				t = t + this._keyStr.charAt(s) + this._keyStr.charAt(o) + this._keyStr.charAt(u) + this._keyStr.charAt(a)
+			}
+			return t
+		},
+		decode: function(e) {
+			var t = "";
+			var n, r, i;
+			var s, o, u, a;
+			var f = 0;
+			e = e.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+			while (f < e.length) {
+				s = this._keyStr.indexOf(e.charAt(f++));
+				o = this._keyStr.indexOf(e.charAt(f++));
+				u = this._keyStr.indexOf(e.charAt(f++));
+				a = this._keyStr.indexOf(e.charAt(f++));
+				n = s << 2 | o >> 4;
+				r = (o & 15) << 4 | u >> 2;
+				i = (u & 3) << 6 | a;
+				t = t + String.fromCharCode(n);
+				if (u != 64) {
+					t = t + String.fromCharCode(r)
+				}
+				if (a != 64) {
+					t = t + String.fromCharCode(i)
+				}
+			}
+			t = Base64._utf8_decode(t);
+			return t
+		},
+		_utf8_encode: function(e) {
+			e = e.replace(/\r\n/g, "\n");
+			var t = "";
+			for (var n = 0; n < e.length; n++) {
+				var r = e.charCodeAt(n);
+				if (r < 128) {
+					t += String.fromCharCode(r)
+				} else if (r > 127 && r < 2048) {
+					t += String.fromCharCode(r >> 6 | 192);
+					t += String.fromCharCode(r & 63 | 128)
+				} else {
+					t += String.fromCharCode(r >> 12 | 224);
+					t += String.fromCharCode(r >> 6 & 63 | 128);
+					t += String.fromCharCode(r & 63 | 128)
+				}
+			}
+			return t
+		},
+		_utf8_decode: function(e) {
+			var t = "";
+			var n = 0;
+			var r = c1 = c2 = 0;
+			while (n < e.length) {
+				r = e.charCodeAt(n);
+				if (r < 128) {
+					t += String.fromCharCode(r);
+					n++
+				} else if (r > 191 && r < 224) {
+					c2 = e.charCodeAt(n + 1);
+					t += String.fromCharCode((r & 31) << 6 | c2 & 63);
+					n += 2
+				} else {
+					c2 = e.charCodeAt(n + 1);
+					c3 = e.charCodeAt(n + 2);
+					t += String.fromCharCode((r & 15) << 12 | (c2 & 63) << 6 | c3 & 63);
+					n += 3
+				}
+			}
+			return t
+		}
+	}
 }
-String.prototype.replaceAll = function(s1,s2){
-　　return this.replace(new RegExp(s1,"gm"),s2);
+
+String.prototype.replaceAll = function(s1, s2) {　　
+	return this.replace(new RegExp(s1, "gm"), s2);
 }
 
 function showSSLoadingBar(seconds){
@@ -74,14 +202,8 @@ function showSSLoadingBar(seconds){
 	blockmarginTop= winHeight*0.3-140		
 	
 	document.getElementById("loadingBarBlock").style.marginTop = blockmarginTop+"px";
-	// marked by Jerry 2012.11.14 using CSS to decide the margin
 	document.getElementById("loadingBarBlock").style.marginLeft = blockmarginLeft+"px";
 	document.getElementById("loadingBarBlock").style.width = 770+"px";
-
-	
-	/*blockmarginTop = document.documentElement.scrollTop + 200;
-	document.getElementById("loadingBarBlock").style.marginTop = blockmarginTop+"px";*/
-
 	document.getElementById("LoadingBar").style.width = winW+"px";
 	document.getElementById("LoadingBar").style.height = winH+"px";
 	
@@ -98,6 +220,7 @@ function showSSLoadingBar(seconds){
 
 
 function LoadingSSProgress(seconds){
+	action = document.form.ss_basic_action.value;
 	document.getElementById("LoadingBar").style.visibility = "visible";
 	if (document.form.ss_basic_action.value == 9){
 		document.getElementById("loading_block3").innerHTML = "应用负载均衡设置 ..."
@@ -108,7 +231,7 @@ function LoadingSSProgress(seconds){
 		document.getElementById("loading_block3").innerHTML = "SS服务关闭中 ..."
 		$j("#loading_block2").html("<li><font color='#ffcc00'><a href='http://www.koolshare.cn' target='_blank'></font>SS工作有问题？请来我们的<font color='#ffcc00'>论坛www.koolshare.cn</font>反应问题...</font></li>");
 	} else {
-		if (document.form.ss_basic_action.value == 1){
+		if (action == 1 || action == 2 || action == 3 || action == 4){
 			if (document.form.ss_basic_mode.value == 6){
 				document.getElementById("loading_block3").innerHTML = "回国启用中 ..."
 				$j("#loading_block2").html("<li><font color='#ffcc00'>此期间请勿访问屏蔽网址，以免污染DNS进入缓存</font></li><li><font color='#ffcc00'>在此期间请不要刷新本页面，不然可能导致问题！</font></li>");
@@ -128,58 +251,20 @@ function LoadingSSProgress(seconds){
 				document.getElementById("loading_block3").innerHTML = "gfwlist模式启用中 ..."
 				$j("#loading_block2").html("<li><font color='#ffcc00'>此期间请勿访问屏蔽网址，以免污染DNS进入缓存</font></li><li><font color='#ffcc00'>尝试不同的DNS解析方案，可以达到最佳的效果哦...</font></li><li><font color='#ffcc00'>请等待日志显示完毕，并出现自动关闭按钮！</font></li><li><font color='#ffcc00'>在此期间请不要刷新本页面，不然可能导致问题！</font></li>");
 			}
-		}else if (document.form.ss_basic_action.value == 2){
-			document.getElementById("loading_block3").innerHTML = "快速重启DNS服务 ..."
-			$j("#loading_block2").html("<li><font color='#ffcc00'>此期间请勿访问屏蔽网址，以免污染DNS进入缓存</font></li><li><font color='#ffcc00'>无需重启全部服务，DNS即可生效~</font></li>");
-		} else if (document.form.ss_basic_action.value == 3){
-			document.getElementById("loading_block3").innerHTML = "快速应用黑白名单 ..."
-			$j("#loading_block2").html("<li><font color='#ffcc00'>此期间请勿访问屏蔽网址，以免污染DNS进入缓存</font></li><li><font color='#ffcc00'>无需重启全部服务，黑白名单即可生效~</font></li>");
-		} else if (document.form.ss_basic_action.value == 4){
-			document.getElementById("loading_block3").innerHTML = "快速应用附加功能 ..."
-			$j("#loading_block2").html("<li><font color='#ffcc00'>此期间请勿访问屏蔽网址，以免污染DNS进入缓存</font></li><li><font color='#ffcc00'>无需重启全部服务，附加功能即可生效~</font></li>");
-		} else if (document.form.ss_basic_action.value == 5){
+		} else if (action == 5){
 			document.getElementById("loading_block3").innerHTML = "shadowsocks插件升级 ..."
-			//document.getElementById("log_content3").rows = 12;
 			$j("#loading_block2").html("<li><font color='#ffcc00'>请勿刷新本页面，等待脚本运行完毕后再刷新！</font></li><li><font color='#ffcc00'>升级服务会自动检测最新版本并下载升级...</font></li>");
-		} else if (document.form.ss_basic_action.value == 6){
+		} else if (action == 6){
 			document.getElementById("loading_block3").innerHTML = "shadowsocks规则更新 ..."
 			$j("#loading_block2").html("<li><font color='#ffcc00'>请勿刷新本页面，等待脚本运行完毕后再刷新！</font></li><li><font color='#ffcc00'>正在自动检测github上的更新...</font></li>");
-		} else if (document.form.ss_basic_action.value == 7){
+		} else if (action == 7){
 			document.getElementById("loading_block3").innerHTML = "恢复shadowsocks配置 ..."
 			$j("#loading_block2").html("<li><font color='#ffcc00'>请勿刷新本页面，配置恢复后需要重新提交！</font></li><li><font color='#ffcc00'>恢复配置中...</font></li>");
-		} else if (document.form.ss_basic_action.value == 8){
+		} else if (action == 8){
 			document.getElementById("loading_block3").innerHTML = "清空shadowsocks配置 ..."
 			$j("#loading_block2").html("<li><font color='#ffcc00'>请勿刷新本页面，正在清空shadowsocks配置...</font></li>");
 		}
 	}
-	/*
-	y = y + progress;
-	if(typeof(seconds) == "number" && seconds >= 0){
-		if(seconds != 0){
-			//document.getElementById("proceeding_img").style.width = Math.round(y) + "%";
-			//document.getElementById("proceeding_img_text").innerHTML = Math.round(y) + "%";
-	
-			if(document.getElementById("loading_block1")){
-				document.getElementById("proceeding_img_text").style.width = document.getElementById("loading_block1").clientWidth;
-				document.getElementById("proceeding_img_text").style.marginLeft = "175px";
-			}
-			--seconds;
-			setTimeout("LoadingSSProgress("+seconds+");", 1000);
-		}
-		else{
-			document.getElementById("proceeding_img_text").innerHTML = "完成";
-			y = 0;
-				setTimeout("hideSSLoadingBar();",1000);
-				//refreshpage()
-				htmlbodyforIE = document.getElementsByTagName("html");  //this both for IE&FF, use "html" but not "body" because <!DOCTYPE html PUBLIC.......>
-				htmlbodyforIE[0].style.overflow = "visible";	  //hidden the Y-scrollbar for preventing from user scroll it.
-				line_show();
-				checkss = 0;
-				setTimeout("get_ss_status_data();",6000);
-		}
-	}
-	*/
-
 }
 
 function LoadingLocalProgress(seconds){
@@ -391,6 +476,7 @@ function openssHint(itemNum){
 		statusmenu +="<b><font color='#669900'>优点：</font></b>简单暴力，全部出国；可选仅web浏览走ss，还是全部tcp代理走ss，因为不需要区分国内外流量，因此性能最好。</br>"
 		statusmenu +="<b><font color='#669900'>缺点：</font></b>国内网站全部走ss，迅雷下载和BT全部走SS流量。</span></br></br>"
 		_caption = "模式说明";
+	
 		return overlib(statusmenu, OFFSETX, -860, OFFSETY, -290, LEFT, STICKY, WIDTH, 'width', CAPTION, _caption, CLOSETITLE, '');
 	}
 	else if(itemNum == 2){
@@ -695,7 +781,7 @@ function openssHint(itemNum){
 }
 
 function showDropdownClientList(_callBackFun, _callBackFunParam, _interfaceMode, _containerID, _pullArrowID, _clientState) {
-	document.body.onclick = function() {control_dropdown_client_block(_containerID, _pullArrowID);}
+	document.body.addEventListener("click", function(_evt) {control_dropdown_client_block(_containerID, _pullArrowID, _evt);})
 	if(clientList.length == 0){
 		setTimeout(function() {
 			genClientList();
@@ -705,9 +791,9 @@ function showDropdownClientList(_callBackFun, _callBackFunParam, _interfaceMode,
 	}
 
 	var htmlCode = "";
-	htmlCode += "<div id='clientlist_online'></div>";
-	htmlCode += "<div id='clientlist_dropdown_expand' class='clientlist_dropdown_expand' onclick='expand_hide_Client(\"clientlist_dropdown_expand\", \"clientlist_offline\");' onmouseover='over_var=1;' onmouseout='over_var=0;'>Show Offline Client List</div>";
-	htmlCode += "<div id='clientlist_offline'></div>";
+	htmlCode += "<div id='" + _containerID + "_clientlist_online'></div>";
+	htmlCode += "<div id='" + _containerID + "_clientlist_dropdown_expand' class='clientlist_dropdown_expand' onclick='expand_hide_Client(\"" + _containerID + "_clientlist_dropdown_expand\", \"" + _containerID + "_clientlist_offline\");' onmouseover='over_var=1;' onmouseout='over_var=0;'>Show Offline Client List</div>";
+	htmlCode += "<div id='" + _containerID + "_clientlist_offline'></div>";
 	document.getElementById(_containerID).innerHTML = htmlCode;
 
 	var param = _callBackFunParam.split(">");
@@ -725,7 +811,10 @@ function showDropdownClientList(_callBackFun, _callBackFunParam, _interfaceMode,
 				}
 				break;
 			case "name" :
-				attribute_value = (clientObj.nickName == "") ? clientObj.name : clientObj.nickName;
+				attribute_value = (clientObj.nickName == "") ? clientObj.name.replace(/'/g, "\\'") : clientObj.nickName.replace(/'/g, "\\'");
+				break;
+			default :
+				attribute_value = _attribute;
 				break;
 		}
 		return attribute_value;
@@ -754,14 +843,16 @@ function showDropdownClientList(_callBackFun, _callBackFunParam, _interfaceMode,
 		code += '\''
 		code += clientName;
 		code += '\');">';
+		code += '<strong>';
 		if(clientName.length > 32) {
 			code += clientName.substring(0, 30) + "..";
 		}
 		else {
 			code += clientName;
 		}
+		code += '</strong>';
 		if(_state == "offline")
-			code += '<strong title="Remove this client" style="float:right;margin-right:5px;cursor:pointer;" onclick="removeClient(\'' + clientObj.mac + '\', \'clientlist_dropdown_expand\', \'clientlist_offline\')">×</strong>';
+			code += '<strong title="Remove this client" style="float:right;margin-right:5px;cursor:pointer;" onclick="removeClient(\'' + clientObj.mac + '\', \'' + _containerID  + '_clientlist_dropdown_expand\', \'' + _containerID  + '_clientlist_offline\')">×</strong>';
 		code += '</div><!--[if lte IE 6.5]><iframe class="hackiframe2"></iframe><![endif]--></a>';
 		return code;
 	};
@@ -777,10 +868,10 @@ function showDropdownClientList(_callBackFun, _callBackFunParam, _interfaceMode,
 					continue;
 				}
 				if(clientObj.isOnline) {
-					document.getElementById("clientlist_online").innerHTML += genClientItem("online");
+					document.getElementById("" + _containerID + "_clientlist_online").innerHTML += genClientItem("online");
 				}
 				else if(clientObj.from == "nmpClient") {
-					document.getElementById("clientlist_offline").innerHTML += genClientItem("offline");
+					document.getElementById("" + _containerID + "_clientlist_offline").innerHTML += genClientItem("offline");
 				}
 				break;
 			case "online" :
@@ -791,7 +882,7 @@ function showDropdownClientList(_callBackFun, _callBackFunParam, _interfaceMode,
 					continue;
 				}
 				if(clientObj.isOnline) {
-					document.getElementById("clientlist_online").innerHTML += genClientItem("online");
+					document.getElementById("" + _containerID + "_clientlist_online").innerHTML += genClientItem("online");
 				}
 				break;
 			case "offline" :
@@ -802,31 +893,31 @@ function showDropdownClientList(_callBackFun, _callBackFunParam, _interfaceMode,
 					continue;
 				}
 				if(clientObj.from == "nmpClient") {
-					document.getElementById("clientlist_offline").innerHTML += genClientItem("offline");
+					document.getElementById("" + _containerID + "_clientlist_offline").innerHTML += genClientItem("offline");
 				}
 				break;
 		}		
 	}
 	
-	if(document.getElementById("clientlist_offline").childNodes.length == "0") {
-		if(document.getElementById("clientlist_dropdown_expand") != null) {
-			removeElement(document.getElementById("clientlist_dropdown_expand"));
+	if(document.getElementById("" + _containerID + "_clientlist_offline").childNodes.length == "0") {
+		if(document.getElementById("" + _containerID + "_clientlist_dropdown_expand") != null) {
+			removeElement(document.getElementById("" + _containerID + "_clientlist_dropdown_expand"));
 		}
-		if(document.getElementById("clientlist_offline") != null) {
-			removeElement(document.getElementById("clientlist_offline"));
+		if(document.getElementById("" + _containerID + "_clientlist_offline") != null) {
+			removeElement(document.getElementById("" + _containerID + "_clientlist_offline"));
 		}
 	}
 	else {
-		if(document.getElementById("clientlist_dropdown_expand").innerText == "Show Offline Client List") {
-			document.getElementById("clientlist_offline").style.display = "none";
+		if(document.getElementById("" + _containerID + "_clientlist_dropdown_expand").innerText == "Show Offline Client List") {
+			document.getElementById("" + _containerID + "_clientlist_offline").style.display = "none";
 		}
 		else {
-			document.getElementById("clientlist_offline").style.display = "";
+			document.getElementById("" + _containerID + "_clientlist_offline").style.display = "";
 		}
 	}
-	if(document.getElementById("clientlist_online").childNodes.length == "0") {
-		if(document.getElementById("clientlist_online") != null) {
-			removeElement(document.getElementById("clientlist_online"));
+	if(document.getElementById("" + _containerID + "_clientlist_online").childNodes.length == "0") {
+		if(document.getElementById("" + _containerID + "_clientlist_online") != null) {
+			removeElement(document.getElementById("" + _containerID + "_clientlist_online"));
 		}
 	}
 
