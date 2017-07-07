@@ -1,5 +1,22 @@
 Koolshare Asuswrt-Merlin shadowsocks Changelog
 ===========================================
+3.5.8
+   - update	更新shadowsocks-libev到3.0.7；
+   - fix	修复当主模式为游戏模式，acl主机为其它模式时，acl主机udp仍然走ss的bug；
+   - update	更新内置规则gfwlist.conf，chnroute.txt，cdn.txt到最新，gfwlist将82个国家域名限制为google，避免gfwlist模式下访问到淘宝全球等问题；
+   - update 	路由器本身走ss域名增加entware.net，方便ss用户更快的安装entware；
+   - update 	ss详细状态增加SHADOWSOCKS_GFW_EXT链显示。
+
+3.5.7
+   - fix	修复节点面板字体超出边界的问题；
+   - fix 	修复nat-start在开机时候被触发多次造成nat规则重复；
+   - fix	修复开机启动后在nat PREROUTING内ss在kp之前，造成使用kp后国外过滤失效；
+
+3.5.6
+   - update	更新ss-libev ssr-libev到最新;
+   - update 	更新界面字体;
+   - add	nat表新增SHADOWSOCKS-EXT链，以支持koolproxy：现在更新最新koolproxy插件后可以过滤ss流量，例如youtube广告.
+
 3.5.5
    - fix	修复SHADOWSOCKS_GAM链有时候不创建的问题。
 
