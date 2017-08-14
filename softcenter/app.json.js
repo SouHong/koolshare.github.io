@@ -11,24 +11,14 @@
             "version": "1.3"
         }, 
         {
-            "build_date": "2017-02-06_22:20:04", 
+            "build_date": "2017-07-21_20:46:17", 
             "description": "", 
             "home_url": "Module_policy_route.asp", 
-            "md5": "81a8f99e947851378fa5b24914cf5ecd", 
+            "md5": "cf6a909e31294abcd51f7b59b78a60c9", 
             "name": "dualwan", 
             "tar_url": "dualwan/dualwan.tar.gz", 
             "title": "策略路由", 
-            "version": "1.6"
-        }, 
-        {
-            "build_date": "2016-11-25_21:41:36", 
-            "description": "SVPN让游戏更畅快", 
-            "home_url": "Module_shadowvpn.asp", 
-            "md5": "2f156357fb324562eda66410a6b2ad64", 
-            "name": "shadowvpn", 
-            "tar_url": "shadowvpn/shadowvpn.tar.gz", 
-            "title": "Shadowvpn", 
-            "version": "2.9"
+            "version": "2.0"
         }, 
         {
             "build_date": "2017-01-15_19:54:28", 
@@ -71,16 +61,6 @@
             "version": "2.2"
         }, 
         {
-            "build_date": "2016-11-22_21:53:42", 
-            "description": "基于kcp协议的udp网络加速", 
-            "home_url": "Module_kcptun.asp", 
-            "md5": "7f103db8cdb9cd8a69a1d871006a6d3a", 
-            "name": "kcptun", 
-            "tar_url": "kcptun/kcptun.tar.gz", 
-            "title": "kcptun", 
-            "version": "2.2.6"
-        }, 
-        {
             "build_date": "2016-06-20_17:00:29", 
             "description": "迅雷快鸟，为上网加速而生~", 
             "home_url": "Module_kuainiao.asp", 
@@ -101,16 +81,6 @@
             "version": "0.2"
         }, 
         {
-            "build_date": "2017-07-04_18:00:26", 
-            "description": "科学上网", 
-            "home_url": "Main_Ss_Content.asp", 
-            "md5": "c75a26bb69fa8f31b117f69c6cd8f94f", 
-            "name": "shadowsocks", 
-            "tar_url": "shadowsocks/shadowsocks.tar.gz", 
-            "title": "shadowsocks", 
-            "version": "3.5.8"
-        }, 
-        {
             "build_date": "2016-05-07_01:41:30", 
             "description": "点对点建立连接,下载更快", 
             "home_url": "", 
@@ -122,7 +92,7 @@
         }
     ], 
     "home_url": "https://raw.githubusercontent.com/koolshare/koolshare.github.io/master", 
-    "md5": "bbbb3a96ac575bef7d04c080a865da70", 
+    "md5": "0f8f59fba4dfbf47062b008f52105bf1", 
     "tar_url": "softcenter/softcenter.tar.gz", 
-    "version": "1.3.3"
+    "version": "1.3.4"
 }
